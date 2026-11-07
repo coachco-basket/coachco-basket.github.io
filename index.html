@@ -123,6 +123,12 @@ input:disabled,textarea:disabled{opacity:.9;color:var(--ne-f)}
 .vtabs button.on{background:var(--cy);border-color:var(--cy);color:var(--cy-ink)}
 .banner{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .mvb{display:flex;gap:4px;flex:none}
+.grip{width:34px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mut);touch-action:none;cursor:grab;border-radius:8px}
+.grip:focus-visible{outline:2px solid var(--cy)}
+.item .grip{height:36px;width:30px}
+.dragging{position:relative;z-index:40;opacity:.95;box-shadow:0 12px 28px rgba(0,0,0,.55);transition:none}
+.dropline{position:fixed;height:3px;border-radius:2px;background:var(--cy);box-shadow:0 0 8px var(--cy);z-index:50;pointer-events:none}
+body.sorting{user-select:none;-webkit-user-select:none}
 .mvb button{width:34px;height:34px;border-radius:10px;border:0;background:var(--ne-t);color:var(--ne-f);display:flex;align-items:center;justify-content:center}
 .empty{border:1px dashed var(--line2);border-radius:14px;padding:18px;text-align:center;color:var(--mut);font-size:14px;display:flex;flex-direction:column;gap:10px;align-items:center}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;font-size:13px}
@@ -421,6 +427,7 @@ function render(top){
   $('#app').innerHTML=`<div class="page">${html}</div>${nav()}`;
   if(top)window.scrollTo(0,0);
 }
+const GRIP=`<span class="grip" role="button" tabindex="0" aria-label="Déplacer (flèches haut et bas au clavier)"><svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></g></svg></span>`;
 const backBtn=()=>`<button type="button" class="ib" data-a="back" aria-label="Retour">${I.back}</button>`;
 
 /* ---------- installation sur le téléphone ---------- */
@@ -576,13 +583,13 @@ function vSeance(){
   const c=t.cycleId&&cyById(t.cycleId);const dur=trDuration(t);
   const blocks=t.blocks.map((b,i)=>{
     const d=blockData(b);const L=blockLabel(b,t);
-    if(!d)return `<div class="row"><span class="lbl t-ne">?</span><span class="grow mut">Élément supprimé de la bibliothèque</span><div class="mvb"><button type="button" data-a="blkDel" data-i="${i}" aria-label="Retirer">${I.x}</button></div></div>`;
+    if(!d)return `<div class="row" data-sid="${b.id}" style="padding:8px 8px 8px 4px">${GRIP}<span class="lbl t-ne">?</span><span class="grow mut">Élément supprimé de la bibliothèque</span><div class="mvb"><button type="button" data-a="blkDel" data-i="${i}" aria-label="Retirer">${I.x}</button></div></div>`;
     const vl=versLabel(b);
     const sub=b.kind==='match'?`<span class="small" style="color:var(--go-f)">${blockDuration(b)?blockDuration(b)+' min · ':'<b style="color:var(--red)">Durée à préciser</b> · '}${esc(d.rule||'Règle à préciser')}</span>`:`<span class="small mut">${d.duration?esc(d.duration)+' min':''}${d.duration&&vl?' · ':''}${esc(vl)}</span>`;
-    return `<div class="row ${L[2]}" style="padding:8px 8px 8px 10px">
+    return `<div class="row ${L[2]}" data-sid="${b.id}" style="padding:8px 8px 8px 4px">${GRIP}
     <button type="button" data-a="openBlk" data-i="${i}" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;background:none;border:0;color:inherit;text-align:left;padding:2px 0;font:inherit">
     <span class="lbl ${L[1]}">${L[0]}</span><span class="grow"><span class="t15" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${esc(d.title||'Sans titre')}${b.adapt?'<span class="chip b-go" style="font-weight:600;font-size:11px;padding:1px 7px">Adapté</span>':''}</span>${sub}</span></button>
-    <div class="mvb">${i>0?`<button type="button" data-a="blkMv" data-i="${i}" data-d="-1" aria-label="Monter">${I.up}</button>`:''}${i<t.blocks.length-1?`<button type="button" data-a="blkMv" data-i="${i}" data-d="1" aria-label="Descendre">${I.down}</button>`:''}<button type="button" data-a="blkDel" data-i="${i}" aria-label="Retirer de la séance">${I.x}</button></div></div>`;
+    <div class="mvb"><button type="button" data-a="blkDel" data-i="${i}" aria-label="Retirer de la séance">${I.x}</button></div></div>`;
   }).join('');
   return `<header class="hdr">${backBtn()}<h1 class="h1 grow">Séance</h1><button type="button" class="btn sm bg" data-a="pdf" style="height:44px">PDF</button><button type="button" class="ib" data-a="trMenu" aria-label="Plus d'actions">${I.dots}</button></header>
   <section class="hero" style="cursor:default;${t.cec?'background:var(--go-c);border-color:var(--go-b)':''}">
@@ -600,7 +607,7 @@ function vSeance(){
   </section>
   <label class="chk c-go" style="border:1px solid var(--go-b);color:var(--go-f)" for="cecbox"><span>Séance CEC (ateliers)<br><span class="small" style="font-weight:400;color:#E8D9A8">Échauffements, puis ateliers en parallèle, puis match</span></span><input type="checkbox" id="cecbox" data-f="tr.cec" ${t.cec?'checked':''}></label>
   <h3 class="sec k-cy">Déroulé · ${t.blocks.length} bloc${t.blocks.length>1?'s':''}</h3>
-  ${blocks||'<div class="empty">Ajoute un échauffement, des exercices et un match.</div>'}
+  ${blocks?`<p class="small mut" style="margin:0">Maintiens la poignée ⠿ et fais glisser pour changer l'ordre.</p><div data-sort="blocks" data-group="blocks" style="display:flex;flex-direction:column;gap:12px">${blocks}</div>`:'<div class="empty">Ajoute un échauffement, des exercices et un match.</div>'}
   <div class="grid2"><button type="button" class="btn wide bp" data-a="newEx" data-tr="1">+ Nouvel exercice</button><button type="button" class="btn wide bg" data-a="pickEx">Depuis la bibliothèque</button></div>
   <button type="button" class="btn wide" style="background:var(--ma-t);color:var(--ma)" data-a="pickMa">+ Match à thème</button>`;
 }
@@ -687,9 +694,42 @@ function vProjet(){
   <label class="fld"><span class="flab">Catégorie</span><input data-f="pj.category" value="${esc(P.category)}" placeholder="Ex. U13 garçons"></label>
   <div class="chips" role="group" aria-label="Domaines">${P.domains.map((d,i)=>`<button type="button" class="chip t-${domCol(d.name,i)} ${d.id===UI.dom?'sel':''}" data-a="dom" data-id="${d.id}">${esc(d.name)}</button>`).join('')}<button type="button" class="chip bdash" data-a="addDom">+ Domaine</button></div>
   ${dom?LEVELS.map((L,li)=>{const items=dom.items.filter(x=>x.level===li);return `<section class="card c-${L[1]} lvl"><h2 class="sec k-${L[1]}" style="margin:0">${L[0]}</h2>
-   ${items.map(x=>`<div class="item" style="background:var(--${L[1]}-t)"><span>${esc(x.label)}</span><button type="button" data-a="delItem" data-id="${x.id}" aria-label="Retirer ${esc(x.label)}">${I.x}</button></div>`).join('')}
+   <div data-sort="lvl" data-group="pj" data-l="${li}" style="display:flex;flex-direction:column;gap:8px;min-height:10px">${items.map(x=>`<div class="item" data-sid="${x.id}" style="background:var(--${L[1]}-t);padding-left:2px">${GRIP}<span>${esc(x.label)}</span><button type="button" data-a="delItem" data-id="${x.id}" aria-label="Retirer ${esc(x.label)}">${I.x}</button></div>`).join('')}</div>
    <form class="addrow" data-form="item" data-l="${li}"><label style="flex:1;display:flex"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nouvel élément en ${L[0]}</span><input id="add-${li}" placeholder="Ajouter un élément"></label><button type="submit" class="btn sm bp" style="height:44px" aria-label="Ajouter en ${L[0]}">+</button></form></section>`}).join('')
    +(P.domains.length>1?`<button type="button" class="btn sm bd" data-a="delDom" style="align-self:flex-start">${I.trash} Supprimer le domaine « ${esc(dom.name)} »</button>`:''):''}`;
+}
+
+/* ---------- réordonnancement libre (glisser-déposer) ---------- */
+let DRG=null;
+document.addEventListener('pointerdown',e=>{
+  const g=e.target.closest&&e.target.closest('.grip');if(!g||ED)return;
+  const it=g.closest('[data-sid]'),box=it&&it.closest('[data-sort]');if(!box)return;
+  e.preventDefault();try{g.setPointerCapture(e.pointerId)}catch(_){}
+  const ind=document.createElement('div');ind.className='dropline';document.body.appendChild(ind);
+  DRG={it,box,group:box.dataset.group,id:it.dataset.sid,y0:e.clientY,sy0:window.scrollY,pid:e.pointerId,ind,target:null,last:box};
+  it.classList.add('dragging');document.body.classList.add('sorting');dragMove(e);
+});
+document.addEventListener('pointermove',e=>{if(DRG&&e.pointerId===DRG.pid){e.preventDefault();dragMove(e)}},{passive:false});
+function dragMove(e){
+  const D=DRG;if(e.clientY<90)window.scrollBy(0,-14);else if(e.clientY>innerHeight-120)window.scrollBy(0,14);
+  D.it.style.transform=`translateY(${e.clientY-D.y0+(window.scrollY-D.sy0)}px)`;
+  const boxes=[...document.querySelectorAll(`[data-sort][data-group="${D.group}"]`)];
+  const box=boxes.find(b=>{const r=(b.closest('section')||b).getBoundingClientRect();return e.clientY>=r.top&&e.clientY<=r.bottom})||D.last;D.last=box;
+  const items=[...box.children].filter(x=>x.dataset&&x.dataset.sid&&x!==D.it);
+  let idx=items.length;for(let i=0;i<items.length;i++){const r=items[i].getBoundingClientRect();if(e.clientY<r.top+r.height/2){idx=i;break}}
+  D.target={box,idx};
+  const br=box.getBoundingClientRect();let y;
+  if(idx<items.length)y=items[idx].getBoundingClientRect().top-6;else if(items.length)y=items[items.length-1].getBoundingClientRect().bottom+4;else y=br.top+br.height/2;
+  Object.assign(D.ind.style,{top:y+'px',left:br.left+'px',width:br.width+'px'});
+}
+function dragEnd(e){if(!DRG||e.pointerId!==DRG.pid)return;const D=DRG;DRG=null;D.ind.remove();D.it.classList.remove('dragging');D.it.style.transform='';document.body.classList.remove('sorting');if(D.target)applySort(D.group,D.id,D.target.box,D.target.idx)}
+document.addEventListener('pointerup',dragEnd);document.addEventListener('pointercancel',dragEnd);
+document.addEventListener('keydown',e=>{const g=e.target.closest&&e.target.closest('.grip');if(!g||(e.key!=='ArrowUp'&&e.key!=='ArrowDown'))return;e.preventDefault();const it=g.closest('[data-sid]'),box=it.closest('[data-sort]');const sib=[...box.children].filter(x=>x.dataset&&x.dataset.sid);const i=sib.indexOf(it);const j=e.key==='ArrowUp'?i-1:i+1;if(j<0||j>=sib.length)return;applySort(box.dataset.group,it.dataset.sid,box,j);const ng=document.querySelector(`[data-sid="${it.dataset.sid}"] .grip`);if(ng)ng.focus()});
+function applySort(group,id,box,idx){
+  if(group==='blocks'){const t=trById(R.id);if(!t)return;const from=t.blocks.findIndex(b=>b.id===id);if(from<0)return;const [b]=t.blocks.splice(from,1);t.blocks.splice(idx,0,b)}
+  else if(group==='pj'){const dm=S.projet.domains.find(x=>x.id===UI.dom);if(!dm)return;const from=dm.items.findIndex(x=>x.id===id);if(from<0)return;const [it]=dm.items.splice(from,1);it.level=+box.dataset.l;
+    const same=dm.items.filter(x=>x.level===it.level);if(idx<same.length)dm.items.splice(dm.items.indexOf(same[idx]),0,it);else if(same.length)dm.items.splice(dm.items.indexOf(same[same.length-1])+1,0,it);else dm.items.push(it)}
+  save();render();
 }
 
 /* ---------- feuilles (bottom sheets) ---------- */
