@@ -34,6 +34,7 @@
   --du:#D6DBE3;--du-t:#2A2F38;--du-c:#1E222A;--du-b:#3D4450;
   --ec:#C5F26F;--ec-t:#2A3512;--ec-c:#1B2311;--ec-b:#3A4A1A;
   --at:#E2AC7E;--at-t:#3A2616;--at-c:#261B12;--at-b:#55392A;
+  --pc:#8E8CFF;--pc-t:#1F1E4D;--pc-c:#171633;--pc-b:#302E6E;
   --ma:#5EEAD4;--ma-t:#0E3A35;--ma-c:#102824;--ma-b:#1E4E47;
   --hero:#0D2A35;--hero-b:#1F5D6E;--wood:#D2A46B;--ink:#1B1D21;
   --ff:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;--fd:'Space Grotesk','Inter',system-ui,sans-serif;
@@ -72,14 +73,14 @@ button.chip{height:32px;padding:0 12px;font-size:13px}
 .row{display:flex;align-items:center;gap:12px;text-align:left;width:100%;color:inherit;font:inherit;border-radius:14px;border:1px solid var(--line);padding:10px 12px;box-sizing:border-box}
 .row{background:var(--card)}
 .row.c-cy,.c-cy{background:var(--cy-c);border-color:var(--cy-b)}.row.c-go,.c-go{background:var(--go-c);border-color:var(--go-b)}.row.c-vi,.c-vi{background:var(--vi-c);border-color:var(--vi-b)}.row.c-gr,.c-gr{background:var(--gr-c);border-color:var(--gr-b)}
-.row.c-pa,.c-pa{background:var(--pa-c);border-color:var(--pa-b)}.row.c-dr,.c-dr{background:var(--dr-c);border-color:var(--dr-b)}.row.c-ti,.c-ti{background:var(--ti-c);border-color:var(--ti-b)}.row.c-de,.c-de{background:var(--de-c);border-color:var(--de-b)}.row.c-du,.c-du{background:var(--du-c);border-color:var(--du-b)}.row.c-ec,.c-ec{background:var(--ec-c);border-color:var(--ec-b)}.row.c-at,.c-at{background:var(--at-c);border-color:var(--at-b)}.row.c-ma,.c-ma{background:var(--ma-c);border-color:var(--ma-b)}
-.t-pa{background:var(--pa-t);color:var(--pa)}.t-dr{background:var(--dr-t);color:var(--dr)}.t-ti{background:var(--ti-t);color:var(--ti)}.t-de{background:var(--de-t);color:var(--de)}.t-du{background:var(--du-t);color:var(--du)}.t-ec{background:var(--ec-t);color:var(--ec)}.t-at{background:var(--at-t);color:var(--at)}.t-ma{background:var(--ma-t);color:var(--ma)}
-.d-pa,.b-pa{background:var(--pa);color:#0B1733}.d-dr,.b-dr{background:var(--dr);color:#1E1440}.d-ti,.b-ti{background:var(--ti);color:#3A0D33}.d-de,.b-de{background:var(--de);color:#3A0A14}.d-du,.b-du{background:var(--du);color:#1A1E26}.d-ec,.b-ec{background:var(--ec);color:#1E2A08}.d-at,.b-at{background:var(--at);color:#3A220E}.d-ma,.b-ma{background:var(--ma);color:#05302A}
+.row.c-pa,.c-pa{background:var(--pa-c);border-color:var(--pa-b)}.row.c-dr,.c-dr{background:var(--dr-c);border-color:var(--dr-b)}.row.c-ti,.c-ti{background:var(--ti-c);border-color:var(--ti-b)}.row.c-de,.c-de{background:var(--de-c);border-color:var(--de-b)}.row.c-du,.c-du{background:var(--du-c);border-color:var(--du-b)}.row.c-ec,.c-ec{background:var(--ec-c);border-color:var(--ec-b)}.row.c-at,.c-at{background:var(--at-c);border-color:var(--at-b)}.row.c-pc,.c-pc{background:var(--pc-c);border-color:var(--pc-b)}.row.c-ma,.c-ma{background:var(--ma-c);border-color:var(--ma-b)}
+.t-pa{background:var(--pa-t);color:var(--pa)}.t-dr{background:var(--dr-t);color:var(--dr)}.t-ti{background:var(--ti-t);color:var(--ti)}.t-de{background:var(--de-t);color:var(--de)}.t-du{background:var(--du-t);color:var(--du)}.t-ec{background:var(--ec-t);color:var(--ec)}.t-at{background:var(--at-t);color:var(--at)}.t-ma{background:var(--ma-t);color:var(--ma)}.t-pc{background:var(--pc-t);color:var(--pc)}
+.d-pa,.b-pa{background:var(--pa);color:#0B1733}.d-dr,.b-dr{background:var(--dr);color:#1E1440}.d-ti,.b-ti{background:var(--ti);color:#3A0D33}.d-de,.b-de{background:var(--de);color:#3A0A14}.d-du,.b-du{background:var(--du);color:#1A1E26}.d-ec,.b-ec{background:var(--ec);color:#1E2A08}.d-at,.b-at{background:var(--at);color:#3A220E}.d-pc,.b-pc{background:var(--pc);color:#14123D}.d-ma,.b-ma{background:var(--ma);color:#05302A}
 .k-pa{color:var(--pa)}.k-dr{color:var(--dr)}.k-ti{color:var(--ti)}.k-de{color:var(--de)}.k-du{color:var(--du)}.k-ec{color:var(--ec)}.k-at{color:var(--at)}.k-ma{color:var(--ma)}
 .gold{background:var(--go-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 /* effet brillant : un dégradé métallique construit à partir de la couleur --c */
-.bp,.seg button.on,.b-cy,.d-cy,.cal .tr,.b-gr,.d-gr,.b-vi,.b-pa,.d-pa,.b-dr,.d-dr,.b-ti,.d-ti,.b-de,.d-de,.b-du,.d-du,.b-ec,.d-ec,.b-at,.d-at,.b-ma,.d-ma,.cyb,.cybar{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 45%,#fff) 0%,var(--c) 28%,color-mix(in srgb,var(--c) 86%,#000) 52%,color-mix(in srgb,var(--c) 70%,#fff) 76%,color-mix(in srgb,var(--c) 84%,#000) 100%)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,#fff)}
-.bp,.seg button.on,.b-cy,.d-cy,.cal .tr{--c:var(--cy)}.b-gr,.d-gr{--c:var(--gr)}.b-vi{--c:var(--vi)}.b-pa,.d-pa{--c:var(--pa)}.b-dr,.d-dr{--c:var(--dr)}.b-ti,.d-ti{--c:var(--ti)}.b-de,.d-de{--c:var(--de)}.b-du,.d-du{--c:var(--du)}.b-ec,.d-ec{--c:var(--ec)}.b-at,.d-at{--c:var(--at)}.b-ma,.d-ma{--c:var(--ma)}
+.bp,.seg button.on,.b-cy,.d-cy,.cal .tr,.b-gr,.d-gr,.b-vi,.b-pa,.d-pa,.b-dr,.d-dr,.b-ti,.d-ti,.b-de,.d-de,.b-du,.d-du,.b-ec,.d-ec,.b-at,.d-at,.b-ma,.d-ma,.b-pc,.d-pc,.cyb,.cybar{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 45%,#fff) 0%,var(--c) 28%,color-mix(in srgb,var(--c) 86%,#000) 52%,color-mix(in srgb,var(--c) 70%,#fff) 76%,color-mix(in srgb,var(--c) 84%,#000) 100%)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,#fff)}
+.bp,.seg button.on,.b-cy,.d-cy,.cal .tr{--c:var(--cy)}.b-gr,.d-gr{--c:var(--gr)}.b-vi{--c:var(--vi)}.b-pa,.d-pa{--c:var(--pa)}.b-dr,.d-dr{--c:var(--dr)}.b-ti,.d-ti{--c:var(--ti)}.b-de,.d-de{--c:var(--de)}.b-du,.d-du{--c:var(--du)}.b-ec,.d-ec{--c:var(--ec)}.b-at,.d-at{--c:var(--at)}.b-ma,.d-ma{--c:var(--ma)}.b-pc,.d-pc{--c:var(--pc)}
 .chip[class*="t-"],.row[class*="c-"],.card[class*="c-"],.lvl,.item,.tile{background-image:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,0) 55%)!important}
 .chip[class*="t-"]{box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
 /* une couleur par cycle (--cc) */
@@ -220,7 +221,7 @@ const fdate=(s,o)=>s?pd(s).toLocaleDateString('fr-FR',o||{weekday:'short',day:'n
 const dshort=s=>pd(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
 const norm=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 
-const TAGS=[['echauffement','Échauffement','ec'],['atelier','Atelier CEC','go'],['passe','Passe','pa'],['dribble','Dribble','dr'],['tir','Tir','ti'],['defense','Défense','de'],['duel','Duel','du'],['offensif','Offensif','ne'],['defensif','Défensif','ne']];
+const TAGS=[['echauffement','Échauffement','ec'],['atelier','Atelier CEC','go'],['passe','Passe','pa'],['dribble','Dribble','dr'],['tir','Tir','ti'],['defense','Défense','de'],['duel','Duel','du'],['precollectif','Pré-collectif','pc'],['offensif','Offensif','ne'],['defensif','Défensif','ne']];
 const TAG={};TAGS.forEach(t=>TAG[t[0]]=t);
 const THEMECOL=['ma'];
 const DOMCOL={dribble:'dr',passe:'pa',tir:'ti',defense:'de',attitude:'at',duel:'du',echauffement:'ec'};
