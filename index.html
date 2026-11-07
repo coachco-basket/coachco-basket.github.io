@@ -174,6 +174,9 @@ nav.tabs button.on span{background:var(--cy-t)}
   #print .pv{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
   #print .pv svg{width:100%;height:auto;border-radius:6px}
   #print p{margin:2px 0}
+  #print .pl{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+  #print ul{margin:2px 0 0;padding-left:16px}
+  #print .pb,#print .lab{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print .lab{font-size:8pt;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#555}
 }
 @media (max-width:380px){.f3{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -680,7 +683,7 @@ function vMatch(){
 function vProjet(){
   const P=S.projet;if(!UI.dom||!P.domains.find(d=>d.id===UI.dom))UI.dom=P.domains[0]&&P.domains[0].id;
   const dom=P.domains.find(d=>d.id===UI.dom);
-  return `<header class="hdr"><div class="grow"><h1 class="h1">Projet <span style="color:var(--cy)">pédagogique</span></h1><span class="small" style="color:var(--go-f)">Projet technique de la saison</span></div></header>
+  return `<header class="hdr"><div class="grow"><h1 class="h1">Projet <span style="color:var(--cy)">pédagogique</span></h1><span class="small" style="color:var(--go-f)">Projet technique de la saison</span></div><button type="button" class="btn sm bg" data-a="pdfPj" style="height:44px">PDF</button></header>
   <label class="fld"><span class="flab">Catégorie</span><input data-f="pj.category" value="${esc(P.category)}" placeholder="Ex. U13 garçons"></label>
   <div class="chips" role="group" aria-label="Domaines">${P.domains.map((d,i)=>`<button type="button" class="chip t-${domCol(d.name,i)} ${d.id===UI.dom?'sel':''}" data-a="dom" data-id="${d.id}">${esc(d.name)}</button>`).join('')}<button type="button" class="chip bdash" data-a="addDom">+ Domaine</button></div>
   ${dom?LEVELS.map((L,li)=>{const items=dom.items.filter(x=>x.level===li);return `<section class="card c-${L[1]} lvl"><h2 class="sec k-${L[1]}" style="margin:0">${L[0]}</h2>
@@ -792,6 +795,7 @@ const A={
   blkDel:d=>{const t=trById(R.id);t.blocks.splice(+d.i,1);save();render()},
   openBlk:d=>{const t=trById(R.id);const b=t.blocks[+d.i];if(!b)return;if(b.kind==='match'){go('match',{id:b.ref,tid:t.id,bid:b.id})}else go('ex',{id:b.ref,tid:t.id,bid:b.id})},
   pdf:()=>printTr(trById(R.id)),
+  pdfPj:()=>printProjet(),
   newEx:d=>{closeSheet(true);sheetNewEx(d.tr==='1'||R.view==='seance')},
   openEx:d=>go('ex',{id:d.id}),
   delEx:()=>{const e=exById(R.id);const u=usage(e.id);askConfirm(`Supprimer « ${esc(e.title)} » de la bibliothèque ?${u?` Il est utilisé dans ${u} séance${u>1?'s':''} et en sera retiré.`:''}`,'Supprimer',()=>{S.exercises=S.exercises.filter(x=>x.id!==e.id);S.trainings.forEach(t=>t.blocks=t.blocks.filter(b=>!(b.kind==='ex'&&b.ref===e.id&&!b.adapt)));save();back()})},
@@ -885,6 +889,15 @@ function printTr(t){
     const vs=b.vers==='all'?d.versions:d.versions.filter(v=>b.vers.includes(v.id));
     return `<div class="pb"><span class="lab">${L}${d.duration?' · '+esc(d.duration)+' min':''}${d.players?' · '+esc(d.players)+' joueurs':''}${d.material?' · '+esc(d.material):''}${b.adapt?' · adapté':''}</span><h2>${esc(d.title)}</h2>${vs.map((v,i)=>`<div class="pv" style="${i?'border-top:1px dashed #ccc;padding-top:8px':''}"><div>${vs.length>1?`<p class="lab">${esc(v.name)}${v.change?' — '+esc(v.change):''}</p>`:''}${v.els&&v.els.length?drawingSvg(v.els,''):''}</div><div>${v.deroulement?`<p class="lab">Déroulement</p><p>${esc(v.deroulement)}</p>`:''}${v.rotations?`<p class="lab">Rotations</p><p>${esc(v.rotations)}</p>`:''}${v.challenge?`<p class="lab">Challenge</p><p>${esc(v.challenge)}</p>`:''}${v.consignes?`<p class="lab">Consignes</p><p>${esc(v.consignes)}</p>`:''}</div></div>`).join('')}</div>`}).join('');
   $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13)}<div style="flex:1"><h1>${esc(t.title||'Séance')}</h1><p>${t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''}${t.players?' · '+esc(t.players)+' joueurs':''}${t.baskets?' · '+esc(t.baskets)+' paniers':''}${trDuration(t)?' · '+fmtMin(trDuration(t)):''}${t.cec?' · CEC':''}${c?' · Cycle '+esc(c.title):''}</p>${t.comment?`<p><i>${esc(t.comment)}</i></p>`:''}</div></div>${parts}`;
+  try{window.print()}catch(e){}
+}
+
+const HEX={pa:'#6EA8FF',dr:'#B794FF',ti:'#F07CE4',de:'#FF6B81',at:'#E2AC7E',du:'#B8BFCB',ec:'#9CCB3F',gr:'#4ADE80',cy:'#06B6D4',go:'#E8A914'};
+function printProjet(){
+  const P=S.projet;
+  const doms=P.domains.map((d,i)=>{const col=HEX[domCol(d.name,i)]||'#888';
+    return `<div class="pb" style="border-top:5px solid ${col}"><h2 style="color:#111">${esc(d.name)}</h2><div class="pl">${LEVELS.map((L,li)=>{const items=d.items.filter(x=>x.level===li);return `<div><p class="lab" style="color:${HEX[L[1]]}">● ${L[0]}</p>${items.length?`<ul>${items.map(x=>`<li>${esc(x.label)}</li>`).join('')}</ul>`:'<p style="color:#999">—</p>'}</div>`}).join('')}</div></div>`}).join('');
+  $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13)}<div style="flex:1"><h1>Projet pédagogique</h1><p>${P.category?esc(P.category)+' · ':''}Saison ${(()=>{const d=new Date();const y=d.getMonth()>=7?d.getFullYear():d.getFullYear()-1;return y+'-'+(y+1)})()}${S.settings.coach?' · '+esc(S.settings.coach):''}</p></div></div>${doms||'<p>Aucun domaine.</p>'}`;
   try{window.print()}catch(e){}
 }
 
