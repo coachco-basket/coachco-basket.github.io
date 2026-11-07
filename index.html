@@ -832,7 +832,7 @@ const A={
   reuseTr:d=>{const t=trById(d.id);const c=clone(t);c.id=uid();c.title=(t.title||'Séance')+' (modèle)';c.date='';c.cycleId=null;c.blocks.forEach(b=>b.id=uid());S.trainings.push(c);save();go('seance',{id:c.id});sheetTr(c)},
   delTr:()=>{const id=R.id;askConfirm('Supprimer cette séance ? Les exercices restent dans la bibliothèque.','Supprimer',()=>{S.trainings=S.trainings.filter(t=>t.id!==id);save();back()})},
   blkMv:d=>{const t=trById(R.id);const i=+d.i,j=i+(+d.d);[t.blocks[i],t.blocks[j]]=[t.blocks[j],t.blocks[i]];save();render()},
-  blkDel:d=>{const t=trById(R.id);t.blocks.splice(+d.i,1);save();render()},
+  blkDel:d=>{const t=trById(R.id);const b=t.blocks[+d.i];if(!b)return;const bd=blockData(b);askConfirm(`Retirer « ${esc(bd&&bd.title||'cet élément')} » de la séance ?${bd&&b.kind==='ex'&&!b.adapt?' L\'exercice reste dans ta bibliothèque.':''}${b.adapt?' Les adaptations faites pour cette séance seront perdues.':''}`,'Retirer',()=>{const i=t.blocks.indexOf(b);if(i>=0)t.blocks.splice(i,1);save()})},
   openBlk:d=>{const t=trById(R.id);const b=t.blocks[+d.i];if(!b)return;if(b.kind==='match'){go('match',{id:b.ref,tid:t.id,bid:b.id})}else go('ex',{id:b.ref,tid:t.id,bid:b.id})},
   pdf:()=>printTr(trById(R.id)),
   pdfPj:()=>printProjet(),
@@ -866,7 +866,7 @@ const A={
   dom:d=>{UI.dom=d.id;render()},
   addDom:()=>openSheet(`<h2 class="h2">Nouveau domaine</h2><form data-form="dom" style="display:flex;flex-direction:column;gap:12px"><label class="fld"><span class="flab">Nom</span><input id="ndom" placeholder="Ex. Rebond" data-focus="1"></label><button type="submit" class="btn wide bp">Ajouter</button></form>`),
   delDom:()=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);askConfirm(`Supprimer le domaine « ${esc(dm.name)} » et ses éléments ?`,'Supprimer',()=>{S.projet.domains=S.projet.domains.filter(x=>x.id!==dm.id);UI.dom=null;save()})},
-  delItem:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);dm.items=dm.items.filter(x=>x.id!==d.id);save();render()},
+  delItem:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);const it=dm.items.find(x=>x.id===d.id);if(!it)return;askConfirm(`Supprimer « ${esc(it.label)} » du projet pédagogique ?`,'Supprimer',()=>{dm.items=dm.items.filter(x=>x.id!==d.id);save()})},
   exportData:()=>{const data=JSON.stringify(S);let ok=false;try{const b=new Blob([data],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='coachco-sauvegarde-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();ok=true}catch(e){}
     const o=$('#expout');if(o)o.innerHTML=`<p class="small mut" style="margin:0">${ok?'Si le fichier ne s\'est pas téléchargé, copie le texte ci-dessous et garde-le dans tes notes.':'Copie ce texte et garde-le dans tes notes.'}</p><textarea readonly style="min-height:90px;font-size:11px" id="exptxt">${esc(data)}</textarea><button type="button" class="btn sm bn" data-a="copyExp">Copier le texte</button>`},
   copyExp:(d,el)=>{const ta=$('#exptxt');const ok=()=>{el.textContent='Texte copié'};try{navigator.clipboard.writeText(ta.value).then(ok,()=>{ta.focus();ta.select()})}catch(e){ta.focus();ta.select()}},
