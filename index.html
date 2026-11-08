@@ -40,7 +40,12 @@
   --ff:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;--fd:'Space Grotesk','Inter',system-ui,sans-serif;
   color-scheme:dark;
 }
+*,*::before,*::after{box-sizing:border-box}
 html,body{height:100%}
+body{overflow-x:clip}
+.sheet>*,.page>*{flex-shrink:0}
+.sheet .btn.wide{height:52px;font-size:16px}
+nav.tabs{flex-shrink:0}
 body{background:var(--bg);color:var(--fg);font:15px/1.45 var(--ff);-webkit-tap-highlight-color:transparent}
 button{cursor:pointer;font-family:var(--ff)}
 :focus-visible{outline:2px solid var(--cy);outline-offset:2px}
@@ -1155,7 +1160,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108104658';
+const APP_VER='20261108105322';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
