@@ -524,7 +524,7 @@ function cycleHero(c,big){
 }
 function vHome(){
   const t0=today();const cur=currentCycle();
-  const up=S.trainings.filter(t=>t.date&&t.date>=t0).sort((a,b)=>a.date.localeCompare(b.date));
+  const up=S.trainings.filter(t=>t.date&&t.date>=t0&&t.cycleId&&cyById(t.cycleId)).sort((a,b)=>a.date.localeCompare(b.date));
   const futureCy=S.cycles.filter(c=>cycleStatus(c)==='future').sort((a,b)=>(a.start||'').localeCompare(b.start||''));
   let feed='';let group=cur?cur.id:undefined;
   if(cur){const mine=up.filter(t=>t.cycleId===cur.id);feed+=`<h3 class="sec k-cy">À venir</h3>`+(mine.map(t=>trRow(t)).join('')||`<div class="empty">Aucune séance prévue dans ce cycle.<button type="button" class="btn sm bp" data-a="newTr" data-cy="${cur.id}" data-d="${today()}">+ Ajouter une séance</button></div>`)}
@@ -1166,7 +1166,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108121135';
+const APP_VER='20261108142641';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
