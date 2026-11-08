@@ -388,7 +388,7 @@ function elBody(el){
     case 'terrain':return `<path d="${COURT_FULL}" fill="none" stroke="${LINE}" stroke-width="3" vector-effect="non-scaling-stroke"/>`;
     case 'demi':return `<g transform="translate(-210 0)"><path d="${COURT_HALF}" fill="none" stroke="${LINE}" stroke-width="3" vector-effect="non-scaling-stroke"/></g>`;
     case 'panier':return `<path d="M-10 -28V28" stroke="${LINE}" stroke-width="6" stroke-linecap="round"/><path d="M-10 0H-3" stroke="${LINE}" stroke-width="4"/><circle cx="6" cy="0" r="9" fill="none" stroke="#F97316" stroke-width="4"/>`;
-    case 'plot':return `<path d="M0 -17L15 12H-15Z" fill="#FFC93C" stroke="#7A5A08" stroke-width="2.5" stroke-linejoin="round"/>`;
+    case 'plot':{const k=PLOTCOL[el.color]||PLOTCOL.jaune;return `<path d="M0 -17L15 12H-15Z" fill="${k[0]}" stroke="${k[1]}" stroke-width="2.5" stroke-linejoin="round"/>`}
     case 'att':return `<path d="M-14 -14L14 14M14 -14L-14 14" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`;
     case 'porteur':return `<circle r="24" fill="none" stroke="${INK}" stroke-width="4.5"/><path d="M-12 -12L12 12M12 -12L-12 12" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"/>`;
     case 'def':return `<path d="M-23 9A23 23 0 0 1 23 9" fill="none" stroke="${DEF}" stroke-width="7.5" stroke-linecap="round"/>`;
@@ -398,7 +398,9 @@ function elBody(el){
   }
   return '';
 }
-const AT_K=1.6;function atW(el){return (64+Math.min(String(el.label||'').length,28)*10.5)*AT_K}
+const AT_K=1.6;const PLOTCOL={jaune:['#FFC93C','#7A5A08','Jaune'],rouge:['#EF4444','#7F1D1D','Rouge'],bleu:['#3B82F6','#1E3A8A','Bleu'],vert:['#22C55E','#14532D','Vert']};
+const plotSw=(cur,extra)=>Object.keys(PLOTCOL).map(k=>`<button type="button" data-e="plotCol" data-c="${k}" aria-label="Plot ${PLOTCOL[k][2].toLowerCase()}" aria-pressed="${cur===k}" style="width:36px;height:36px;border-radius:10px;border:2px solid ${cur===k?'#fff':'transparent'};background:${PLOTCOL[k][0]};flex:none"></button>`).join('');
+function atW(el){return (64+Math.min(String(el.label||'').length,28)*10.5)*AT_K}
 function txtBox(el){const L=String(el.text||'').split('\n');const mx=Math.max(2,...L.map(l=>l.length));return {w:mx*12.5+24,h:L.length*26+14}}
 const isArrow=t=>['passe','depl','dribble','tir','main'].includes(t);
 function elSvg(el,hit){
@@ -1069,7 +1071,9 @@ function edSelBar(){
   const b=$('#edsel');if(!b)return;
   if(ED.gym){b.innerHTML=`<button type="button" class="btn sm bg" data-e="gymSave">Enregistrer comme mon gymnase</button>${S.settings.gym?'<button type="button" class="btn sm bn" data-e="gymLoad">Charger mon gymnase</button>':''}<button type="button" class="btn sm bd" data-e="clearAll">Tout effacer</button><button type="button" class="btn sm bn" data-e="gymClose">Fermer</button>`;return}
   const el=ED.sel&&ED.els.find(e=>e.id===ED.sel);
+  if(!el&&ED.tool==='plot'){b.innerHTML=`<span>Couleur des plots :</span>${plotSw(ED.plotColor||'jaune')}<span>puis touche le terrain.</span>`;return}
   if(!el){const hints={vue:'Glisse pour te déplacer, pince pour zoomer.',select:'Touche un élément pour le déplacer.',passe:'Trace la passe avec le doigt.',depl:'Trace le déplacement.',dribble:'Trace le dribble.',tir:'Trace le tir vers le panier.',main:'Dessine librement. Choisis Attaque (noir) ou Défense (turquoise) avant de tracer.',passe:'Trace la passe avec le doigt.',texte:'Touche le terrain là où tu veux écrire.',gomme:'Touche ou glisse sur un élément pour l\'effacer. Le bouton Annuler le fait revenir.'};b.innerHTML=`<span>${hints[ED.tool]||'Touche le terrain pour placer l\'élément.'}</span>`;return}
+  if(el.type==='plot'){b.innerHTML=`<span>Couleur :</span>${plotSw(el.color||'jaune')}<button type="button" class="btn sm bn" data-e="dup">Dupliquer</button><button type="button" class="btn sm bd" data-e="del">Supprimer</button>`;return}
   if(el.type==='atelier'){b.innerHTML=`<span>Atelier ${el.num||''} : glisse-le sur sa zone, poignée cyan pour pivoter.</span><button type="button" class="btn sm bp" data-e="rot90">Pivoter de 90°</button><button type="button" class="btn sm bn" data-e="smaller">Taille −</button><button type="button" class="btn sm bn" data-e="bigger">Taille +</button>`;return}
   const sc=['terrain','demi','panier','plot','att','porteur','def','ballon','texte'].includes(el.type);
   b.innerHTML=`${isArrow(el.type)?`<button type="button" class="btn sm bn" data-e="flipSide" style="${el.side==='def'?'':'color:#2DD4BF'}">${el.side==='def'?'Passer en flèche attaque':'Passer en flèche défense'}</button>`:''}${el.type==='texte'?'<button type="button" class="btn sm bp" data-e="editTxt">Modifier le texte</button>':''}${ROT_R[el.type]?'<span>Poignée cyan : pivoter</span>':''}${sc?'<button type="button" class="btn sm bn" data-e="smaller" aria-label="Réduire">Taille −</button><button type="button" class="btn sm bn" data-e="bigger" aria-label="Agrandir">Taille +</button>':''}<button type="button" class="btn sm bn" data-e="dup">Dupliquer</button><button type="button" class="btn sm bd" data-e="del">Supprimer</button>`;
@@ -1129,7 +1133,7 @@ function edUp(e){
   if(ED.pinch){if(ED.ptrs.size<2)ED.pinch=null;ED.drag=null;return}
   const D=ED.drag;ED.drag=null;if(!D)return;
   if(D.kind==='place'&&ED.tool==='texte'){if(Math.hypot(e.clientX-D.c[0],e.clientY-D.c[1])<14)openTxt(null,D.p);return}
-  if(D.kind==='place'){if(Math.hypot(e.clientX-D.c[0],e.clientY-D.c[1])<14){pushUndo();const el={id:uid(),type:ED.tool,x:Math.round(D.p[0]),y:Math.round(D.p[1]),rot:ED.tool==='def'?180:0,s:PLACE_S[ED.tool]||1};ED.els.push(el);ED.sel=el.id;edTools()}edDraw();return}
+  if(D.kind==='place'){if(Math.hypot(e.clientX-D.c[0],e.clientY-D.c[1])<14){pushUndo();const el={id:uid(),type:ED.tool,x:Math.round(D.p[0]),y:Math.round(D.p[1]),rot:ED.tool==='def'?180:0,s:PLACE_S[ED.tool]||1};if(ED.tool==='plot')el.color=ED.plotColor||'jaune';ED.els.push(el);ED.sel=el.id;edTools()}edDraw();return}
   if(D.kind==='draw'){let len=0;for(let i=1;i<D.pts.length;i++)len+=Math.hypot(D.pts[i][0]-D.pts[i-1][0],D.pts[i][1]-D.pts[i-1][1]);
     if(D.pts.length>=2&&len>24){pushUndo();const pts=resample(D.pts,ED.tool==='main'?5:10).map(q=>[Math.round(q[0]),Math.round(q[1])]);const st=D.pts[0];let side=ED.side,best=60;ED.els.forEach(q=>{if(['def','att','porteur'].includes(q.type)){const dd=Math.hypot(q.x-st[0],q.y-st[1]);if(dd<best){best=dd;side=q.type==='def'?'def':'att'}}});ED.els.push({id:uid(),type:ED.tool,pts,side});edTools()}edDraw();return}
   if(D.kind==='move'||D.kind==='rot'||D.kind==='erase'){if(D.pushed)edTools();edDraw()}
@@ -1140,6 +1144,7 @@ function edClick(e){
   else if(k==='tool'){ED.tool=b.dataset.t;ED.gym=false;if(ED.tool!=='select')ED.sel=null;edTools();edDraw()}
   else if(k==='editTxt'&&el){openTxt(el)}
   else if(k==='rot90'&&el){pushUndo();el.rot=(((el.rot||0)+90)%360+360)%360;if(el.rot>180)el.rot-=360;edTools();edDraw()}
+  else if(k==='plotCol'){ED.plotColor=b.dataset.c;if(el&&el.type==='plot'){pushUndo();el.color=b.dataset.c;edTools()}edDraw()}
   else if(k==='side'){ED.side=b.dataset.s;edTools();edDraw()}
   else if(k==='flipSide'&&el){pushUndo();el.side=el.side==='def'?'att':'def';edTools();edDraw()}
   else if(k==='txtCancel'){closeTxt()}
@@ -1161,7 +1166,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108105843';
+const APP_VER='20261108121135';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
