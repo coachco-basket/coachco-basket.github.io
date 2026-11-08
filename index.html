@@ -524,7 +524,7 @@ function cycleHero(c,big){
 }
 function vHome(){
   const t0=today();const cur=currentCycle();
-  const up=S.trainings.filter(t=>t.date&&t.date>=t0&&t.cycleId&&cyById(t.cycleId)).sort((a,b)=>a.date.localeCompare(b.date));
+  const up=S.trainings.filter(t=>t.date&&t.date>=t0&&((t.cycleId&&cyById(t.cycleId))||t.planned)).sort((a,b)=>a.date.localeCompare(b.date));
   const futureCy=S.cycles.filter(c=>cycleStatus(c)==='future').sort((a,b)=>(a.start||'').localeCompare(b.start||''));
   let feed='';let group=cur?cur.id:undefined;
   if(cur){const mine=up.filter(t=>t.cycleId===cur.id);feed+=`<h3 class="sec k-cy">À venir</h3>`+(mine.map(t=>trRow(t)).join('')||`<div class="empty">Aucune séance prévue dans ce cycle.<button type="button" class="btn sm bp" data-a="newTr" data-cy="${cur.id}" data-d="${today()}">+ Ajouter une séance</button></div>`)}
@@ -805,6 +805,7 @@ function sheetTr(t){
   <label class="fld"><span class="flab">Petit commentaire</span><textarea data-f="trS.comment">${esc(t.comment)}</textarea></label>
   <div class="f3"><label class="fld"><span class="flab">Date</span><input type="date" data-f="trS.date" value="${esc(t.date)}"></label><label class="fld"><span class="flab">Joueurs</span><input inputmode="numeric" data-f="trS.players" value="${esc(t.players)}"></label><label class="fld"><span class="flab">Paniers</span><input inputmode="numeric" data-f="trS.baskets" value="${esc(t.baskets)}"></label></div>
   <label class="fld"><span class="flab">Cycle</span><select data-f="trS.cycleId"><option value="">Hors cycle</option>${cys.map(c=>`<option value="${c.id}" ${c.id===t.cycleId?'selected':''}>${esc(c.title)}</option>`).join('')}</select></label>
+  <label class="chk c-cy" style="border:1px solid var(--cy-b);color:var(--cy-f)" for="trplan"><span>Prévue au planning<br><span class="small" style="font-weight:400;color:#A7E4EF">Pour une séance hors cycle : elle s'affiche sur l'accueil à sa date</span></span><input type="checkbox" id="trplan" data-f="trS.planned" ${t.planned?'checked':''} style="accent-color:var(--cy)"></label>
   <div class="fld"><span class="flab">Tags de la séance</span><div class="chips">${TAGS.filter(x=>x[0]!=='echauffement'&&x[0]!=='atelier').map(x=>x[0]).concat(S.trTags.map(n=>'c:'+n)).map(k=>{const on=(t.tags||[]).includes(k);return `<button type="button" class="chip ${on?'t-'+tagCol(k)+' sel':'off'}" data-a="tagTr" data-k="${esc(k)}" aria-pressed="${on}">${esc(tagName(k))}</button>`}).join('')}<button type="button" class="chip bdash" data-a="newTrTag">+ Créer un tag</button></div></div>
   <button type="button" class="btn wide bp" data-a="close">Terminé</button>`);
   SHEET_TR=t.id;
@@ -1166,7 +1167,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108142641';
+const APP_VER='20261108142907';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
