@@ -193,6 +193,55 @@ nav.tabs button.on span{background:var(--cy-t)}
   #print ul{margin:2px 0 0;padding-left:16px}
   #print .pb,#print .lab{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print .lab{font-size:8pt;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#555}
+  @page{size:A4;margin:11mm 11mm 13mm;@bottom-right{content:"CoachCo · " counter(page) " / " counter(pages);font:8pt Inter,sans-serif;color:#8A93A3}}
+  #print *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print .hd{background:#12151D;color:#F4F6F8;border-radius:10px;padding:12px 14px;display:flex;gap:14px;align-items:center;margin-bottom:10px}
+  #print .hd h1{color:#fff;font:600 19pt/1.15 var(--fd)}
+  #print .hd .sub{color:#A9B1BD;font-size:9.5pt;margin-top:3px}
+  #print .pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  #print .pill{font-size:8.5pt;font-weight:600;padding:2px 8px;border-radius:9px;background:#252B37;color:#E2E6EC}
+  #print .pill.g{background:linear-gradient(135deg,#FFF3C4,#FFD54F 30%,#E8A914 60%,#FFE38A);color:#2E2205}
+  #print .sec2{font:600 9pt var(--ff);letter-spacing:.08em;text-transform:uppercase;color:#12151D;margin:12px 0 6px;display:flex;align-items:center;gap:8px}
+  #print .sec2::before{content:"";width:16px;height:3px;border-radius:2px;background:#0E7490}
+  #print table.tl{width:100%;border-collapse:collapse;font-size:9.5pt}
+  #print table.tl td{padding:5px 6px;border-bottom:1px solid #E5E8EE;vertical-align:middle}
+  #print table.tl td.t{width:52px;color:#5A6372;font-variant-numeric:tabular-nums}
+  #print table.tl td.d{width:56px;text-align:right;color:#5A6372;font-variant-numeric:tabular-nums}
+  #print table.tl tr.tot td{border-bottom:0;font-weight:700;color:#12151D}
+  #print .tg{display:inline-block;font-size:7.5pt;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:5px;color:#fff;min-width:52px;text-align:center}
+  #print .bk{break-inside:avoid;border:1px solid #DDE1E8;border-radius:10px;margin:0 0 9px;overflow:hidden}
+  #print .bkh{display:flex;align-items:center;gap:9px;padding:7px 11px;background:#F4F6F9;border-bottom:1px solid #DDE1E8}
+  #print .bkh h2{font:600 12pt var(--fd);margin:0;flex:1}
+  #print .bkh .meta{font-size:8.5pt;color:#5A6372;text-align:right}
+  #print .num{width:20px;height:20px;border-radius:10px;background:#12151D;color:#fff;font-size:8.5pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+  #print .bkb{display:grid;grid-template-columns:55% 1fr;gap:12px;padding:9px 11px}
+  #print .bkb.full{grid-template-columns:1fr}
+  #print .bkb svg{width:100%;height:auto;border-radius:6px;display:block}
+  #print .tx h3{font:700 7.5pt var(--ff);letter-spacing:.08em;text-transform:uppercase;margin:6px 0 1px}
+  #print .tx h3:first-child{margin-top:0}
+  #print .tx p{font-size:9.5pt;line-height:1.4;margin:0;white-space:pre-line}
+  #print .chg{background:#FFF6DB;border:1px solid #F1D27A;border-radius:6px;padding:4px 7px;font-size:9pt;margin-bottom:6px}
+  #print .vsep{border-top:1px dashed #D3D8E0}
+  #print .rule{display:flex;align-items:center;gap:10px;background:#ECFDF8;border:1px solid #99E6D3;border-radius:8px;padding:7px 10px;font-weight:600;font-size:10.5pt}
+  #print .pts{font:700 14pt var(--fd);width:40px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FFF3C4,#FFD54F 30%,#E8A914 60%,#FFE38A);color:#2E2205;flex:none}
+  #print .lg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  #print .lg span{font-size:8.5pt;font-weight:600;padding:2px 8px;border-radius:9px;color:#12151D}
+  #print .notes{break-inside:avoid;border:1px solid #DDE1E8;border-radius:10px;padding:9px 11px}
+  #print .notes i{display:block;height:22px;border-bottom:1px solid #DDE1E8}
+  #print .hd2{position:relative;overflow:hidden;background:#12151D;color:#F4F6F8;border-radius:12px;padding:14px 16px 12px;margin-bottom:10px}
+  #print .hd2 .court{position:absolute;right:-30px;top:-20px;width:330px;height:180px;opacity:.13}
+  #print .hd2 .row1{position:relative;display:flex;gap:14px;align-items:center}
+  #print .hd2 .eb{font:700 8pt var(--ff);letter-spacing:.16em;text-transform:uppercase;color:#F5C84C}
+  #print .sec2{break-after:avoid;page-break-after:avoid}
+  #print .hd2 h1{color:#fff;font:600 23pt/1.08 var(--fd);margin:3px 0 0;letter-spacing:-.01em}
+  #print .hd2 .ul{width:64px;height:4px;border-radius:2px;margin-top:7px;background:linear-gradient(90deg,#FFF3C4,#FFD54F 25%,#E8A914 55%,#FFE38A 80%,#C68A0A)}
+  #print .hd2 .cm{color:#B9C2CF;font-size:9.5pt;font-style:italic;margin-top:6px}
+  #print .lgo{width:64px;height:64px;border-radius:32px;background:#1B2030;border:1.5px solid #3A4252;display:flex;align-items:center;justify-content:center;flex:none}
+  #print .sb{position:relative;display:flex;gap:6px;flex:none}
+  #print .sb div{background:#0B0D12;border:1px solid #2C3342;border-radius:8px;padding:5px 9px;text-align:center;min-width:58px}
+  #print .sb b{display:block;font:700 15pt/1 var(--fd);color:#FFD54F;font-variant-numeric:tabular-nums}
+  #print .sb span{display:block;font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:#8A93A3;margin-top:3px}
+  #print .hd2 .row2{position:relative;display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:9px;border-top:1px solid #262C38}
 }
 @media (max-width:380px){.f3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
@@ -261,8 +310,8 @@ const I={
  chev:'<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
  dots:'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg>'
 };
-function logo(size,show13){
-  return `<svg width="${size}" height="${size}" viewBox="0 0 40 40" role="img" aria-label="Logo CoachCo"><path d="M29.9 10.8A16 16 0 0 1 20 36M4 20H20" fill="none" stroke="#C0C4CA" stroke-width="1.2" stroke-linecap="round"/><path d="M10.8 6.9Q16.4 20 10.8 33.1M29.2 6.9Q23.6 20 29.2 33.1" fill="none" stroke="#C0C4CA" stroke-width="1.2" opacity=".35"/><path d="M20 4A16 16 0 0 0 20 36" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"/><path d="M20 4V36M20 20H36M20 4A16 16 0 0 1 29.9 10.8" fill="none" stroke="url(#gg)" stroke-width="2.6" stroke-linecap="round"/>${show13?'<text x="24.2" y="31.5" font-size="7.5" font-weight="700" fill="url(#gg)" font-family="Space Grotesk,Inter,sans-serif">13</text>':''}</svg>`;
+function logo(size,show13,flat){const G=flat?'#E8A914':'url(#gg)';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 40 40" role="img" aria-label="Logo CoachCo"><path d="M29.9 10.8A16 16 0 0 1 20 36M4 20H20" fill="none" stroke="#C0C4CA" stroke-width="1.2" stroke-linecap="round"/><path d="M10.8 6.9Q16.4 20 10.8 33.1M29.2 6.9Q23.6 20 29.2 33.1" fill="none" stroke="#C0C4CA" stroke-width="1.2" opacity=".35"/><path d="M20 4A16 16 0 0 0 20 36" fill="none" stroke="#22D3EE" stroke-width="3" stroke-linecap="round"/><path d="M20 4V36M20 20H36M20 4A16 16 0 0 1 29.9 10.8" fill="none" stroke="${G}" stroke-width="2.6" stroke-linecap="round"/>${show13?'<text x="24.2" y="31.5" font-size="7.5" font-weight="700" fill="'+G+'" font-family="Space Grotesk,Inter,sans-serif">13</text>':''}</svg>`;
 }
 
 /* ---------- données ---------- */
@@ -985,11 +1034,27 @@ document.addEventListener('change',e=>{
 /* ---------- impression PDF ---------- */
 function printTr(t){
   if(!t)return;const c=t.cycleId&&cyById(t.cycleId);
-  const parts=t.blocks.map(b=>{const d=blockData(b);if(!d)return '';const L=blockLabel(b,t)[0];
-    if(b.kind==='match')return `<div class="pb"><span class="lab">${L}${blockDuration(b)?' · '+blockDuration(b)+' min':''}${(d.themes||[]).length?' · '+esc(d.themes.join(', ')):''}</span><h2>${esc(d.title)}</h2><p><b>${esc(d.rule)}</b></p>${d.consignes?`<p>${esc(d.consignes)}</p>`:''}${d.els?`<div class="pv"><div>${drawingSvg(d.els,'')}</div></div>`:''}</div>`;
+  const TC={'ÉCH.':['Échauffement','#4D7C0F'],'EX.':['Exercice','#0E7490'],'ATELIER':['Atelier','#B7791F'],'MATCH':['Match','#0F766E']};
+  const plan=t.cec&&cecAteliers(t).length?syncPlan(t):null;
+  let tm=0;const rows=t.blocks.map((b,i)=>{const d=blockData(b);if(!d)return '';const L=blockLabel(b,t)[0],tc=TC[L]||['','#555'],du=blockDuration(b);const st=tm;tm+=du;
+    return `<tr><td class="t">${du||st?Math.floor(st/60)+'h'+String(st%60).padStart(2,'0'):''}</td><td style="width:70px"><span class="tg" style="background:${tc[1]}">${tc[0].toUpperCase()}</span></td><td><b>${i+1}.</b> ${esc(d.title||'Sans titre')}${b.kind==='match'&&d.rule?` <span style="color:#5A6372">· ${esc(d.rule)}</span>`:''}</td><td class="d">${du?du+' min':'—'}</td></tr>`}).join('');
+  const sec=(h,col,v)=>v?`<h3 style="color:${col}">${h}</h3><p>${esc(v)}</p>`:'';
+  const parts=t.blocks.map((b,i)=>{const d=blockData(b);if(!d)return '';const L=blockLabel(b,t)[0],tc=TC[L]||['','#555'],du=blockDuration(b);
+    const head=(meta)=>`<div class="bkh"><span class="num">${i+1}</span><span class="tg" style="background:${tc[1]}">${tc[0].toUpperCase()}</span><h2>${esc(d.title||'Sans titre')}</h2><span class="meta">${meta}</span></div>`;
+    if(b.kind==='match')return `<div class="bk">${head([du?du+' min':'',(d.themes||[]).join(', ')].filter(Boolean).join(' · '))}<div class="bkb ${d.els?'':'full'}">${d.els?`<div>${drawingSvg(d.els,'')}</div>`:''}<div class="tx"><div class="rule"><span class="pts">${esc((String(d.rule||'').match(/([+]?\d+)\s*pts?/i)||[])[1]||'★')}</span><span>${esc(d.rule||'Règle à préciser')}</span></div>${d.consignes?`<h3 style="color:#5A6372;margin-top:7px">Consignes</h3><p>${esc(d.consignes)}</p>`:''}</div></div></div>`;
     const vs=b.vers==='all'?d.versions:d.versions.filter(v=>b.vers.includes(v.id));
-    return `<div class="pb"><span class="lab">${L}${d.duration?' · '+esc(d.duration)+' min':''}${d.players?' · '+esc(d.players)+' joueurs':''}${d.material?' · '+esc(d.material):''}${b.adapt?' · adapté':''}</span><h2>${esc(d.title)}</h2>${vs.map((v,i)=>`<div class="pv" style="${i?'border-top:1px dashed #ccc;padding-top:8px':''}"><div>${vs.length>1?`<p class="lab">${esc(v.name)}${v.change?' — '+esc(v.change):''}</p>`:''}${v.els&&v.els.length?drawingSvg(v.els,''):''}</div><div>${v.deroulement?`<p class="lab">Déroulement</p><p>${esc(v.deroulement)}</p>`:''}${v.rotations?`<p class="lab">Rotations</p><p>${esc(v.rotations)}</p>`:''}${v.challenge?`<p class="lab">Challenge</p><p>${esc(v.challenge)}</p>`:''}${v.consignes?`<p class="lab">Consignes</p><p>${esc(v.consignes)}</p>`:''}</div></div>`).join('')}</div>`}).join('');
-  $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13)}<div style="flex:1"><h1>${esc(t.title||'Séance')}</h1><p>${t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''}${t.players?' · '+esc(t.players)+' joueurs':''}${t.baskets?' · '+esc(t.baskets)+' paniers':''}${trDuration(t)?' · '+fmtMin(trDuration(t)):''}${t.cec?' · CEC':''}${c?' · Cycle '+esc(c.title):''}</p>${t.comment?`<p><i>${esc(t.comment)}</i></p>`:''}</div></div>${t.cec&&cecAteliers(t).length?`<div class="pb"><span class="lab">Plan des ateliers</span><div style="margin-top:6px">${drawingSvg(syncPlan(t),'planp')}</div></div>`:''}${parts}`;
+    const meta=[d.duration?d.duration+' min':'',d.players?d.players+' joueurs':'',d.material?esc(d.material):'',b.adapt?'adapté':''].filter(Boolean).join(' · ');
+    return `<div class="bk">${head(meta)}${vs.map((v,k)=>{const has=v.els&&v.els.length;return `<div class="bkb ${has?'':'full'} ${k?'vsep':''}">${has?`<div>${vs.length>1?`<p class="lab" style="margin-bottom:3px">${esc(v.name)}</p>`:''}${drawingSvg(v.els,'')}</div>`:''}<div class="tx">${!has&&vs.length>1?`<p class="lab">${esc(v.name)}</p>`:''}${v.change&&k?`<div class="chg"><b>${esc(v.name)} :</b> ${esc(v.change)}</div>`:''}${sec('Déroulement','#0E7490',v.deroulement)}${sec('Rotations','#0E7490',v.rotations)}${sec('Challenge','#B7791F',v.challenge)}${sec('Consignes','#5A6372',v.consignes)}</div></div>`}).join('')}</div>`}).join('');
+  const sc=c&&t.date&&(c.plans||[]).find(x=>x.dow===pd(t.date).getDay());
+  const dur=trDuration(t),eb=['Séance'+(t.cec?' CEC':''),t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''].filter(Boolean).join(' · ');
+  const court='<svg class="court" viewBox="0 0 330 180" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="3"><circle cx="165" cy="90" r="38"/><path d="M165 -10V190"/><path d="M330 10H260A80 80 0 0 0 260 170H330"/><path d="M0 10H70A80 80 0 0 1 70 170H0"/><circle cx="165" cy="90" r="10"/></g></svg>';
+  $('#print').innerHTML=`<div class="hd2">${court}<div class="row1"><div class="lgo">${logo(46,S.settings.show13,1)}</div><div style="flex:1;min-width:0"><div class="eb">${esc(eb)}</div><h1>${esc(t.title||'Séance')}</h1><div class="ul"></div>${t.comment?`<div class="cm">${esc(t.comment)}</div>`:''}</div>
+  <div class="sb">${dur?`<div><b>${dur}</b><span>minutes</span></div>`:''}${t.players?`<div><b>${esc(t.players)}</b><span>joueurs</span></div>`:''}${t.baskets?`<div><b>${esc(t.baskets)}</b><span>paniers</span></div>`:''}</div></div>
+  ${c||(sc&&sc.title)||t.tags&&t.tags.length?`<div class="row2">${c?`<span class="pill" style="background:${cyCol(c)};color:#0B1020">Cycle · ${esc(c.title)}</span>`:''}${sc&&sc.title?`<span class="pill" style="background:${scHex(sc)};color:#0B1020">${esc(dayName(sc.dow))} · ${esc(sc.title)}</span>`:''}${(t.tags||[]).filter(k=>TAG[k]||isCustom(k)).map(k=>`<span class="pill">${esc(tagName(k))}</span>`).join('')}</div>`:''}</div>
+  <div class="sec2">Déroulé</div><table class="tl">${rows}<tr class="tot"><td class="t"></td><td></td><td>Total</td><td class="d">${fmtMin(trDuration(t))||'—'}</td></tr></table>
+  ${plan?`<div class="sec2">Plan des ateliers</div><div class="bk" style="padding:8px">${drawingSvg(plan,'planp')}<div class="lg">${cecAteliers(t).map(b=>{const m=plan.find(e=>e.type==='atelier'&&e.bid===b.id);return `<span style="background:${m.col}33;border:1px solid ${m.col}">${m.num} · ${esc(m.label)}</span>`}).join('')}</div></div>`:''}
+  <div class="sec2">Fiches</div>${parts}
+  <div class="notes"><div class="sec2" style="margin-top:0">Notes après la séance</div><i></i><i></i><i></i><i></i></div>`;
   try{window.print()}catch(e){}
 }
 
@@ -998,7 +1063,7 @@ function printProjet(){
   const P=S.projet;
   const doms=P.domains.map((d,i)=>{const col=HEX[domCol(d.name,i)]||'#888';
     return `<div class="pb" style="border-top:5px solid ${col}"><h2 style="color:#111">${esc(d.name)}</h2><div class="pl">${LEVELS.map((L,li)=>{const items=d.items.filter(x=>x.level===li);return `<div><p class="lab" style="color:${HEX[L[1]]}">● ${L[0]}</p>${items.length?`<ul>${items.map(x=>`<li>${esc(x.label)}</li>`).join('')}</ul>`:'<p style="color:#999">—</p>'}</div>`}).join('')}</div></div>`}).join('');
-  $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13)}<div style="flex:1"><h1>Projet pédagogique</h1><p>${P.category?esc(P.category)+' · ':''}Saison ${(()=>{const d=new Date();const y=d.getMonth()>=7?d.getFullYear():d.getFullYear()-1;return y+'-'+(y+1)})()}${S.settings.coach?' · '+esc(S.settings.coach):''}</p></div></div>${doms||'<p>Aucun domaine.</p>'}`;
+  $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13,1)}<div style="flex:1"><h1>Projet pédagogique</h1><p>${P.category?esc(P.category)+' · ':''}Saison ${(()=>{const d=new Date();const y=d.getMonth()>=7?d.getFullYear():d.getFullYear()-1;return y+'-'+(y+1)})()}${S.settings.coach?' · '+esc(S.settings.coach):''}</p></div></div>${doms||'<p>Aucun domaine.</p>'}`;
   try{window.print()}catch(e){}
 }
 
@@ -1167,7 +1232,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108142907';
+const APP_VER='20261108205243';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
