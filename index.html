@@ -585,6 +585,7 @@ function vCycle(){
    ${c.description?`<p class="cyt" style="margin:0;font-size:14px;white-space:pre-line">${esc(c.description)}</p>`:''}
    ${(c.goals||'').trim()?`<span class="chips">${c.goals.split(',').map(s=>s.trim()).filter(Boolean).map(g=>`<span class="chip cychip">${esc(g)}</span>`).join('')}</span>`:''}
    <span class="small cyt" style="font-weight:500">${c.start?fdate(c.start,{day:'numeric',month:'short'}):'?'} – ${c.end?fdate(c.end,{day:'numeric',month:'short'}):'?'}${c.days?' · '+esc(c.days):''}</span>
+   ${(()=>{const w=cycleWeeks(c);if(!w)return '';const st=cycleStatus(c);const n=st==='past'?w:st==='future'?0:cycleWeekNow(c);return `<div style="display:flex;flex-direction:column;gap:6px;width:100%"><div style="display:grid;grid-template-columns:repeat(${w},minmax(0,1fr));gap:5px;width:100%" role="img" aria-label="Semaine ${n} sur ${w}">${Array.from({length:w},(_,i)=>`<div class="bar ${i<n?'cybar':'cybar-off'}"></div>`).join('')}</div><span class="small cyt" style="font-weight:600">${st==='future'?'Commence le '+fdate(c.start,{day:'numeric',month:'long'}):st==='past'?'Cycle terminé':'Semaine '+n+' / '+w}</span></div>`})()}
   </section>
   ${dayTypes(c,trs)}
   <div class="seg" role="group" aria-label="Affichage"><button type="button" class="${UI.cal?'':'on'}" data-a="cal" data-v="0">Liste</button><button type="button" class="${UI.cal?'on':''}" data-a="cal" data-v="1">Calendrier</button></div>
@@ -1160,7 +1161,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108105322';
+const APP_VER='20261108105843';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
