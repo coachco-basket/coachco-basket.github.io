@@ -410,10 +410,16 @@ function elSvg(el,hit){
   }
   return `<g data-id="${el.id}" transform="${tr}">${h}${elBody(el)}</g>`;
 }
+function elExt(e){const s=e.s||1,r=(e.rot||0)*Math.PI/180,c=Math.abs(Math.cos(r)),n=Math.abs(Math.sin(r));let w,h;
+  if(e.type==='terrain'){w=432;h=237}else if(e.type==='demi'){w=222;h=237}else if(e.type==='atelier'){w=atW(e)/2;h=26*AT_K}else if(e.type==='texte'){const b=txtBox(e);w=b.w/2;h=b.h/2}else if(e.type==='panier'){w=32;h=32}else{w=30;h=30}
+  w*=s;h*=s;return [w*c+h*n,w*n+h*c]}
+function drawBounds(els){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;(els||[]).forEach(e=>{if(isArrow(e.type)){(e.pts||[]).forEach(q=>{x0=Math.min(x0,q[0]-14);y0=Math.min(y0,q[1]-14);x1=Math.max(x1,q[0]+14);y1=Math.max(y1,q[1]+14)})}else{const ex=elExt(e);x0=Math.min(x0,e.x-ex[0]);y0=Math.min(y0,e.y-ex[1]);x1=Math.max(x1,e.x+ex[0]);y1=Math.max(y1,e.y+ex[1])}});return x0>x1?[0,0,1000,700]:[x0,y0,x1,y1]}
+function fitBox(els,ar,pad){const b=drawBounds(els);const x0=b[0]-pad,y0=b[1]-pad,x1=b[2]+pad,y1=b[3]+pad;let w=Math.max(260,x1-x0),h=Math.max(182,y1-y0);const cx=(x0+x1)/2,cy=(y0+y1)/2;if(w/h<ar)w=h*ar;else h=w/ar;return {x:cx-w/2,y:cy-h/2,w,h}}
 function drawingSvg(els,cls){
   const order=t=>t==='terrain'||t==='demi'?0:t==='panier'||t==='plot'?1:isArrow(t)?2:3;
   const list=(els||[]).slice().sort((a,b)=>order(a.type)-order(b.type));
-  return `<svg class="${cls||'thumb'}" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="-1000" y="-1000" width="3000" height="2700" fill="url(#pq)"/>${list.map(e=>elSvg(e,false)).join('')}</svg>`;
+  const v=fitBox(els,10/7,26);
+  return `<svg class="${cls||'thumb'}" viewBox="${v.x.toFixed(1)} ${v.y.toFixed(1)} ${v.w.toFixed(1)} ${v.h.toFixed(1)}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect x="${(v.x-3000).toFixed(0)}" y="${(v.y-3000).toFixed(0)}" width="${(v.w+6000).toFixed(0)}" height="${(v.h+6000).toFixed(0)}" fill="url(#pq)"/>${list.map(e=>elSvg(e,false)).join('')}</svg>`;
 }
 
 /* ---------- navigation ---------- */
@@ -1022,8 +1028,7 @@ function closeTxt(){if(!ED)return;ED.txt=null;const bx=$('#edtxtbox');if(bx)bx.h
 function closeEditor(saveIt){if(!ED)return;const cb=ED.onSave,els=ED.els;if(ED.ro)ED.ro.disconnect();ED.el.remove();ED=null;if(saveIt&&cb)cb(els)}
 function fitVB(){const r=ED.svg.getBoundingClientRect();const cw=r.width||1000,ch=r.height||700;
   // cadre sur les éléments présents
-  let x0=0,y0=0,x1=1000,y1=700;
-  if(ED.els.length){x0=1e9;y0=1e9;x1=-1e9;y1=-1e9;ED.els.forEach(e=>{const ext=e.type==='terrain'?440*(e.s||1):e.type==='demi'?260*(e.s||1):40;const pts=isArrow(e.type)?e.pts:[[e.x,e.y]];pts.forEach(p=>{x0=Math.min(x0,p[0]-ext);y0=Math.min(y0,p[1]-ext);x1=Math.max(x1,p[0]+ext);y1=Math.max(y1,p[1]+ext)})});}
+  let [x0,y0,x1,y1]=ED.els.length?drawBounds(ED.els):[0,0,1000,700];x0-=20;y0-=20;x1+=20;y1+=20;
   const bw=Math.max(300,x1-x0),bh=Math.max(240,y1-y0),cx=(x0+x1)/2,cy=(y0+y1)/2;
   let w=bw*1.06,h=w*ch/cw;if(h<bh*1.06){h=bh*1.06;w=h*cw/ch}
   ED.vb={x:cx-w/2,y:cy-h/2,w,h};setVB()}
@@ -1131,7 +1136,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108094844';
+const APP_VER='20261108095912';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
