@@ -338,7 +338,7 @@ function courtD(half){
   return d;
 }
 const COURT_FULL=courtD(false),COURT_HALF=courtD(true);
-const ROT_R={texte:0,terrain:262,demi:262,panier:58,def:52,plot:0};
+const ROT_R={atelier:76,texte:0,terrain:262,demi:262,panier:58,def:52,plot:0};
 const SEL_R={att:30,porteur:34,def:34,ballon:20,plot:24,panier:40};
 function resample(pts,step){
   if(pts.length<2)return pts.slice();
@@ -392,7 +392,7 @@ function elBody(el){
   }
   return '';
 }
-const AT_K=1.6;function atW(el){return (64+Math.min(String(el.label||'').length,20)*10.5)*AT_K}
+const AT_K=1.6;function atW(el){return (64+Math.min(String(el.label||'').length,28)*10.5)*AT_K}
 function txtBox(el){const L=String(el.text||'').split('\n');const mx=Math.max(2,...L.map(l=>l.length));return {w:mx*12.5+24,h:L.length*26+14}}
 const isArrow=t=>['passe','depl','dribble','tir','main'].includes(t);
 function elSvg(el,hit){
@@ -448,7 +448,7 @@ function syncPlan(t){
   t.plan.els=t.plan.els.filter(e=>{if(e.type!=='atelier')return true;if(ids.includes(e.bid))return true;ch=true;return false});
   ats.forEach((b,i)=>{let m=t.plan.els.find(e=>e.type==='atelier'&&e.bid===b.id);
     if(!m){const n=t.plan.els.filter(e=>e.type==='atelier').length;const q=PLAN_POS[n%PLAN_POS.length];m={id:uid(),type:'atelier',bid:b.id,x:q[0]+Math.floor(n/PLAN_POS.length)*36,y:q[1]+Math.floor(n/PLAN_POS.length)*36,rot:0,s:1};t.plan.els.push(m);ch=true}
-    const d=blockData(b),lab=(d&&d.title)||'Atelier',mc=d?mainTag(d.tags):'ne';m.num=i+1;m.label=lab.length>20?lab.slice(0,19)+'…':lab;m.col=HEX[mc]||'#E8A914'});
+    const d=blockData(b),lab=(d&&d.title)||'Atelier',mc=d?mainTag(d.tags):'ne';m.num=i+1;m.label=lab.length>28?lab.slice(0,27)+'…':lab;m.col=HEX[mc]||'#E8A914'});
   if(ch)save();return t.plan.els;
 }
 
@@ -1040,7 +1040,7 @@ function edSelBar(){
   if(ED.gym){b.innerHTML=`<button type="button" class="btn sm bg" data-e="gymSave">Enregistrer comme mon gymnase</button>${S.settings.gym?'<button type="button" class="btn sm bn" data-e="gymLoad">Charger mon gymnase</button>':''}<button type="button" class="btn sm bd" data-e="clearAll">Tout effacer</button><button type="button" class="btn sm bn" data-e="gymClose">Fermer</button>`;return}
   const el=ED.sel&&ED.els.find(e=>e.id===ED.sel);
   if(!el){const hints={vue:'Glisse pour te déplacer, pince pour zoomer.',select:'Touche un élément pour le déplacer.',passe:'Trace la passe avec le doigt.',depl:'Trace le déplacement.',dribble:'Trace le dribble.',tir:'Trace le tir vers le panier.',main:'Dessine librement. Choisis Attaque (noir) ou Défense (turquoise) avant de tracer.',passe:'Trace la passe avec le doigt.',texte:'Touche le terrain là où tu veux écrire.',gomme:'Touche ou glisse sur un élément pour l\'effacer. Le bouton Annuler le fait revenir.'};b.innerHTML=`<span>${hints[ED.tool]||'Touche le terrain pour placer l\'élément.'}</span>`;return}
-  if(el.type==='atelier'){b.innerHTML=`<span>Atelier ${el.num||''} : fais-le glisser sur son panier ou sa zone.</span><button type="button" class="btn sm bn" data-e="smaller">Taille −</button><button type="button" class="btn sm bn" data-e="bigger">Taille +</button>`;return}
+  if(el.type==='atelier'){b.innerHTML=`<span>Atelier ${el.num||''} : glisse-le sur sa zone, poignée cyan pour pivoter.</span><button type="button" class="btn sm bp" data-e="rot90">Pivoter de 90°</button><button type="button" class="btn sm bn" data-e="smaller">Taille −</button><button type="button" class="btn sm bn" data-e="bigger">Taille +</button>`;return}
   const sc=['terrain','demi','panier','plot','att','porteur','def','ballon','texte'].includes(el.type);
   b.innerHTML=`${isArrow(el.type)?`<button type="button" class="btn sm bn" data-e="flipSide" style="${el.side==='def'?'':'color:#2DD4BF'}">${el.side==='def'?'Passer en flèche attaque':'Passer en flèche défense'}</button>`:''}${el.type==='texte'?'<button type="button" class="btn sm bp" data-e="editTxt">Modifier le texte</button>':''}${ROT_R[el.type]?'<span>Poignée cyan : pivoter</span>':''}${sc?'<button type="button" class="btn sm bn" data-e="smaller" aria-label="Réduire">Taille −</button><button type="button" class="btn sm bn" data-e="bigger" aria-label="Agrandir">Taille +</button>':''}<button type="button" class="btn sm bn" data-e="dup">Dupliquer</button><button type="button" class="btn sm bd" data-e="del">Supprimer</button>`;
 }
@@ -1051,7 +1051,7 @@ function selOverlay(el){
   let s='';const sc=el.s||1;
   if(el.type==='terrain')s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="-432" y="-237" width="864" height="474" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="10 8" vector-effect="non-scaling-stroke"/></g>`;
   else if(el.type==='demi')s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="-222" y="-237" width="444" height="474" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="10 8" vector-effect="non-scaling-stroke"/></g>`;
-  else if(el.type==='atelier'){const w=atW(el);s=`<g transform="translate(${el.x} ${el.y}) scale(${sc})" pointer-events="none"><rect x="${-w/2-6}" y="${-26*AT_K-6}" width="${w+12}" height="${52*AT_K+12}" rx="${30*AT_K}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></g>`}
+  else if(el.type==='atelier'){const w=atW(el);s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="${-w/2-6}" y="${-26*AT_K-6}" width="${w+12}" height="${52*AT_K+12}" rx="${30*AT_K}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></g>`}
   else if(el.type==='texte'){const b=txtBox(el);s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="${-b.w/2-4}" y="${-b.h/2-4}" width="${b.w+8}" height="${b.h+8}" rx="6" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></g>`}
   else s=`<circle cx="${el.x}" cy="${el.y}" r="${(SEL_R[el.type]||30)*sc+6}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" pointer-events="none"/>`;
   const R0=ROT_R[el.type];
@@ -1091,7 +1091,7 @@ function edMove(e){
   const p=toSvgXY(e.clientX,e.clientY);
   if(D.kind==='move'){const el=ED.els.find(x=>x.id===D.id);if(!el)return;const dx=p[0]-D.last[0],dy=p[1]-D.last[1];if(!D.pushed){if(Math.hypot(dx,dy)<2)return;pushUndo();D.pushed=true}
     if(isArrow(el.type))el.pts=el.pts.map(q=>[q[0]+dx,q[1]+dy]);else{el.x+=dx;el.y+=dy}D.last=p;edDraw();return}
-  if(D.kind==='rot'){const el=ED.els.find(x=>x.id===D.id);if(!el)return;if(!D.pushed){pushUndo();D.pushed=true}let a=Math.atan2(p[0]-el.x,-(p[1]-el.y))*180/Math.PI;if(el.type==='terrain'||el.type==='demi'){const s=Math.round(a/90)*90;if(Math.abs(a-s)<6)a=s}el.rot=Math.round(a);edDraw();return}
+  if(D.kind==='rot'){const el=ED.els.find(x=>x.id===D.id);if(!el)return;if(!D.pushed){pushUndo();D.pushed=true}let a=Math.atan2(p[0]-el.x,-(p[1]-el.y))*180/Math.PI;if(el.type==='terrain'||el.type==='demi'||el.type==='atelier'){const s=Math.round(a/90)*90;if(Math.abs(a-s)<6)a=s}el.rot=Math.round(a);edDraw();return}
   if(D.kind==='draw'){const l=D.pts[D.pts.length-1];if(Math.hypot(p[0]-l[0],p[1]-l[1])>=6){D.pts.push([Math.round(p[0]),Math.round(p[1])]);edDraw()}}
 }
 function edUp(e){
@@ -1109,6 +1109,7 @@ function edClick(e){
   if(k==='cancel'||k==='save'){const pushed=ED.pushed;closeEditor(k==='save');if(pushed){IGNORE_POP=true;try{history.back()}catch(_){IGNORE_POP=false}}}
   else if(k==='tool'){ED.tool=b.dataset.t;ED.gym=false;if(ED.tool!=='select')ED.sel=null;edTools();edDraw()}
   else if(k==='editTxt'&&el){openTxt(el)}
+  else if(k==='rot90'&&el){pushUndo();el.rot=(((el.rot||0)+90)%360+360)%360;if(el.rot>180)el.rot-=360;edTools();edDraw()}
   else if(k==='side'){ED.side=b.dataset.s;edTools();edDraw()}
   else if(k==='flipSide'&&el){pushUndo();el.side=el.side==='def'?'att':'def';edTools();edDraw()}
   else if(k==='txtCancel'){closeTxt()}
