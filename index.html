@@ -223,7 +223,7 @@ const fdate=(s,o)=>s?pd(s).toLocaleDateString('fr-FR',o||{weekday:'short',day:'n
 const dshort=s=>pd(s).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
 const norm=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
 
-const TAGS=[['echauffement','Échauffement','ec'],['atelier','Atelier CEC','go'],['passe','Passe','pa'],['dribble','Dribble','dr'],['tir','Tir','ti'],['defense','Défense','de'],['duel','Duel','du'],['precollectif','Pré-collectif','pc'],['offensif','Offensif','ne'],['defensif','Défensif','ne']];
+const TAGS=[['echauffement','Échauffement','ec'],['atelier','Atelier CEC','go'],['passe','Passe','pa'],['dribble','Dribble','dr'],['tir','Tir','go'],['defense','Défense','de'],['duel','Duel','du'],['precollectif','Pré-collectif','pc'],['offensif','Offensif','ne'],['defensif','Défensif','ne']];
 const TAG={};TAGS.forEach(t=>TAG[t[0]]=t);
 const THEMECOL=['ma'];
 const DOMCOL={dribble:'dr',passe:'pa',tir:'ti',defense:'de',attitude:'at',duel:'du',echauffement:'ec'};
@@ -1155,7 +1155,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108103829';
+const APP_VER='20261108104658';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
