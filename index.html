@@ -15,7 +15,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#12151D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
 <style>
 /* Layout : appli téléphone, une colonne centrée (560px max), barre d'onglets fixe en bas */
 :root{
@@ -242,6 +242,26 @@ nav.tabs button.on span{background:var(--cy-t)}
   #print .sb b{display:block;font:700 15pt/1 var(--fd);color:#FFD54F;font-variant-numeric:tabular-nums}
   #print .sb span{display:block;font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:#8A93A3;margin-top:3px}
   #print .hd2 .row2{position:relative;display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:9px;border-top:1px solid #262C38}
+  #print .pos{position:relative;overflow:hidden;border-radius:14px;margin-bottom:12px;color:#fff;min-height:200px;background:#0B0D12}
+  #print .pos .bgw{position:absolute;inset:0;width:100%;height:100%}
+  #print .pos .shade{position:absolute;inset:0;background:linear-gradient(100deg,rgba(11,13,18,.97) 0%,rgba(11,13,18,.9) 46%,rgba(11,13,18,.45) 75%,rgba(11,13,18,.15) 100%)}
+  #print .pos .stripe{position:absolute;top:0;bottom:0;right:120px;width:46px;transform:skewX(-18deg);opacity:.9}
+  #print .pos .stripe2{position:absolute;top:0;bottom:0;right:84px;width:14px;transform:skewX(-18deg);background:linear-gradient(180deg,#FFF3C4,#FFD54F 30%,#E8A914 60%,#FFE38A)}
+  #print .pos .in{position:relative;display:flex;gap:16px;padding:16px 18px 0}
+  #print .pos .dt{flex:none;width:74px;border-radius:12px;padding:8px 0 9px;text-align:center;color:#2E2205;background:linear-gradient(150deg,#FFF3C4,#FFD54F 28%,#E8A914 58%,#FFE38A 80%,#C68A0A);box-shadow:0 6px 16px rgba(0,0,0,.45)}
+  #print .pos .dt small{display:block;font:700 8.5pt var(--ff);letter-spacing:.14em}
+  #print .pos .dt b{display:block;font:700 30pt/1 var(--fd);margin:2px 0}
+  #print .pos .tg2{display:inline-block;font:700 7.5pt var(--ff);letter-spacing:.14em;padding:3px 9px;border-radius:5px;margin-right:5px}
+  #print .pos h1{font:700 italic 27pt/1.02 var(--fd);text-transform:uppercase;letter-spacing:-.005em;margin:8px 0 0;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.6);max-width:92%}
+  #print .pos .cm2{margin-top:7px;font-size:10pt;color:#D7DDE6;max-width:80%}
+  #print .pos .lg2{position:absolute;right:16px;top:14px;width:52px;height:52px;border-radius:26px;background:rgba(18,21,29,.85);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+  #print .pos .lt{position:relative;display:flex;align-items:stretch;margin-top:14px;background:rgba(6,8,12,.88);border-top:2px solid #E8A914}
+  #print .pos .lt .st{padding:8px 16px;border-right:1px solid #2A3140}
+  #print .pos .lt .st b{display:block;font:700 17pt/1 var(--fd);color:#FFD54F;font-variant-numeric:tabular-nums}
+  #print .pos .lt .st span{display:block;font:600 7pt var(--ff);letter-spacing:.14em;color:#9AA3B2;margin-top:3px}
+  #print .pos .lt .sc{flex:1;padding:8px 16px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+  #print .pos .lt .sc span{font:600 7pt var(--ff);letter-spacing:.14em;color:#9AA3B2}
+  #print .pos .lt .sc b{font:600 10.5pt var(--ff);color:#fff;margin-top:2px}
 }
 @media (max-width:380px){.f3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
@@ -1047,10 +1067,13 @@ function printTr(t){
     return `<div class="bk">${head(meta)}${vs.map((v,k)=>{const has=v.els&&v.els.length;return `<div class="bkb ${has?'':'full'} ${k?'vsep':''}">${has?`<div>${vs.length>1?`<p class="lab" style="margin-bottom:3px">${esc(v.name)}</p>`:''}${drawingSvg(v.els,'')}</div>`:''}<div class="tx">${!has&&vs.length>1?`<p class="lab">${esc(v.name)}</p>`:''}${v.change&&k?`<div class="chg"><b>${esc(v.name)} :</b> ${esc(v.change)}</div>`:''}${sec('Déroulement','#0E7490',v.deroulement)}${sec('Rotations','#0E7490',v.rotations)}${sec('Challenge','#B7791F',v.challenge)}${sec('Consignes','#5A6372',v.consignes)}</div></div>`}).join('')}</div>`}).join('');
   const sc=c&&t.date&&(c.plans||[]).find(x=>x.dow===pd(t.date).getDay());
   const dur=trDuration(t),eb=['Séance'+(t.cec?' CEC':''),t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''].filter(Boolean).join(' · ');
-  const court='<svg class="court" viewBox="0 0 330 180" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="3"><circle cx="165" cy="90" r="38"/><path d="M165 -10V190"/><path d="M330 10H260A80 80 0 0 0 260 170H330"/><path d="M0 10H70A80 80 0 0 1 70 170H0"/><circle cx="165" cy="90" r="10"/></g></svg>';
-  $('#print').innerHTML=`<div class="hd2">${court}<div class="row1"><div class="lgo">${logo(46,S.settings.show13,1)}</div><div style="flex:1;min-width:0"><div class="eb">${esc(eb)}</div><h1>${esc(t.title||'Séance')}</h1><div class="ul"></div>${t.comment?`<div class="cm">${esc(t.comment)}</div>`:''}</div>
-  <div class="sb">${dur?`<div><b>${dur}</b><span>minutes</span></div>`:''}${t.players?`<div><b>${esc(t.players)}</b><span>joueurs</span></div>`:''}${t.baskets?`<div><b>${esc(t.baskets)}</b><span>paniers</span></div>`:''}</div></div>
-  ${c||(sc&&sc.title)||t.tags&&t.tags.length?`<div class="row2">${c?`<span class="pill" style="background:${cyCol(c)};color:#0B1020">Cycle · ${esc(c.title)}</span>`:''}${sc&&sc.title?`<span class="pill" style="background:${scHex(sc)};color:#0B1020">${esc(dayName(sc.dow))} · ${esc(sc.title)}</span>`:''}${(t.tags||[]).filter(k=>TAG[k]||isCustom(k)).map(k=>`<span class="pill">${esc(tagName(k))}</span>`).join('')}</div>`:''}</div>
+  const dd=t.date?pd(t.date):null,cc=c?cyCol(c):'#22D3EE';
+  const wood=`<svg class="bgw" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="260" fill="url(#pq)"/><g fill="none" stroke="#fff" stroke-width="5" opacity=".85"><circle cx="760" cy="130" r="70"/><path d="M760 -10V270"/><circle cx="760" cy="130" r="16"/><path d="M520 -10V60A80 80 0 0 0 520 200V270" opacity=".6"/></g></svg>`;
+  $('#print').innerHTML=`<div class="pos">${wood}<div class="shade"></div><div class="stripe" style="background:${cc}"></div><div class="stripe2"></div><div class="lg2">${logo(40,S.settings.show13,1)}</div>
+  <div class="in">${dd?`<div class="dt"><small>${dd.toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','').toUpperCase()}</small><b>${dd.getDate()}</b><small>${dd.toLocaleDateString('fr-FR',{month:'short'}).replace('.','').toUpperCase()}</small></div>`:''}
+  <div style="flex:1;min-width:0;padding-right:70px"><div>${t.cec?'<span class="tg2" style="background:linear-gradient(135deg,#FFF3C4,#FFD54F 30%,#E8A914 60%,#FFE38A);color:#2E2205">SÉANCE CEC</span>':'<span class="tg2" style="background:#22D3EE;color:#052A31">SÉANCE</span>'}${c?`<span class="tg2" style="background:${cc};color:#0B1020">${esc(c.title.toUpperCase())}</span>`:''}</div>
+  <h1>${esc(t.title||'Séance')}</h1>${t.comment?`<div class="cm2">${esc(t.comment)}</div>`:''}</div></div>
+  <div class="lt">${trDuration(t)?`<div class="st"><b>${trDuration(t)}</b><span>MINUTES</span></div>`:''}<div class="st"><b>${t.blocks.length}</b><span>BLOCS</span></div>${t.players?`<div class="st"><b>${esc(t.players)}</b><span>JOUEURS</span></div>`:''}${t.baskets?`<div class="st"><b>${esc(t.baskets)}</b><span>PANIERS</span></div>`:''}<div class="sc">${sc&&sc.title?`<span>SOUS-CYCLE DU ${esc(dayName(sc.dow).toUpperCase())}</span><b>${esc(sc.title)}</b>`:(t.tags||[]).length?`<span>THÈMES</span><b>${(t.tags||[]).filter(k=>TAG[k]||isCustom(k)).map(k=>esc(tagName(k))).join(' · ')}</b>`:''}</div></div></div>
   <div class="sec2">Déroulé</div><table class="tl">${rows}<tr class="tot"><td class="t"></td><td></td><td>Total</td><td class="d">${fmtMin(trDuration(t))||'—'}</td></tr></table>
   ${plan?`<div class="sec2">Plan des ateliers</div><div class="bk" style="padding:8px">${drawingSvg(plan,'planp')}<div class="lg">${cecAteliers(t).map(b=>{const m=plan.find(e=>e.type==='atelier'&&e.bid===b.id);return `<span style="background:${m.col}33;border:1px solid ${m.col}">${m.num} · ${esc(m.label)}</span>`}).join('')}</div></div>`:''}
   <div class="sec2">Fiches</div>${parts}
@@ -1232,7 +1255,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108205243';
+const APP_VER='20261108205518';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
