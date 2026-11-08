@@ -443,7 +443,7 @@ const backBtn=()=>`<button type="button" class="ib" data-a="back" aria-label="Re
 const PLAN_POS=[[250,215],[750,215],[250,485],[750,485],[500,350],[500,150],[500,550],[130,350],[870,350]];
 function cecAteliers(t){return t.blocks.filter(b=>{if(b.kind!=='ex')return false;const d=blockData(b);return !(d&&(d.tags||[]).includes('echauffement'))})}
 function syncPlan(t){
-  if(!t.plan||!Array.isArray(t.plan.els))t.plan={els:defaultEls()};
+  if(!t.plan||!Array.isArray(t.plan.els))t.plan={els:defaultEls(true)};
   const ats=cecAteliers(t),ids=ats.map(b=>b.id);let ch=false;
   t.plan.els=t.plan.els.filter(e=>{if(e.type!=='atelier')return true;if(ids.includes(e.bid))return true;ch=true;return false});
   ats.forEach((b,i)=>{let m=t.plan.els.find(e=>e.type==='atelier'&&e.bid===b.id);
@@ -998,7 +998,7 @@ const TOOLS=[
 ];
 function eraseAt(x,y){const D=ED.drag;const t=document.elementFromPoint(x,y);const g=t&&t.closest&&t.closest('#cv [data-id]');if(!g)return;const id=g.dataset.id;const ex0=ED.els.find(e=>e.id===id);if(!ex0||ex0.type==='atelier')return;if(!D.pushed){pushUndo();D.pushed=true}ED.els=ED.els.filter(e=>e.id!==id);ED.sel=null;edDraw()}
 const PLACE_S={texte:1,terrain:1,demi:1.2,panier:1.6,plot:1,att:1,porteur:1,def:1,ballon:1};
-function defaultEls(){if(S.settings.gym&&S.settings.gym.length)return clone(S.settings.gym).map(e=>(e.id=uid(),e));return [{id:uid(),type:'terrain',x:500,y:350,rot:0,s:1}]}
+function defaultEls(useGym){if(useGym&&S.settings.gym&&S.settings.gym.length)return clone(S.settings.gym).map(e=>(e.id=uid(),e));return [{id:uid(),type:'terrain',x:500,y:350,rot:0,s:1}]}
 function openEditor(els,onSave){
   ED={els:els?clone(els):defaultEls(),onSave,side:'att',tool:'select',sel:null,undo:[],ptrs:new Map(),drag:null,pinch:null,vb:{x:0,y:0,w:1000,h:700},gym:false};
   const o=document.createElement('div');o.className='ed';o.setAttribute('role','dialog');o.setAttribute('aria-label','Éditeur de schéma');
@@ -1123,7 +1123,7 @@ function edClick(e){
   else if((k==='bigger'||k==='smaller')&&el){pushUndo();el.s=Math.max(.3,Math.min(4,(el.s||1)*(k==='bigger'?1.12:0.89)));edTools();edDraw()}
   else if(k==='gym'){ED.gym=!ED.gym;ED.sel=null;edDraw()}
   else if(k==='gymClose'){ED.gym=false;edDraw()}
-  else if(k==='gymSave'){S.settings.gym=clone(ED.els.filter(x=>['terrain','demi','panier','plot'].includes(x.type)));save();$('#edsel').innerHTML='<span style="color:var(--go-f)">Ton gymnase est enregistré : il servira de fond à chaque nouveau schéma.</span><button type="button" class="btn sm bn" data-e="gymClose">OK</button>'}
+  else if(k==='gymSave'){S.settings.gym=clone(ED.els.filter(x=>['terrain','demi','panier','plot'].includes(x.type)));save();$('#edsel').innerHTML='<span style="color:var(--go-f)">Ton gymnase est enregistré : il servira de fond aux plans des séances CEC. Ailleurs, touche Gymnase puis Charger mon gymnase.</span><button type="button" class="btn sm bn" data-e="gymClose">OK</button>'}
   else if(k==='gymLoad'){pushUndo();ED.els=ED.els.filter(x=>!['terrain','demi','panier'].includes(x.type)).concat(clone(S.settings.gym).map(x=>(x.id=uid(),x)));ED.gym=false;edTools();edDraw()}
   else if(k==='clearAll'){pushUndo();ED.els=[];ED.sel=null;ED.gym=false;edTools();edDraw()}
 }
