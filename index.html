@@ -182,6 +182,7 @@ nav.tabs button.on span{background:var(--cy-t)}
   #print .pv{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
   #print .pv svg{width:100%;height:auto;border-radius:6px}
   #print p{margin:2px 0}
+  #print .planp{width:100%;height:auto;border-radius:6px;display:block}
   #print .pl{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
   #print ul{margin:2px 0 0;padding-left:16px}
   #print .pb,#print .lab{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -321,7 +322,7 @@ function usage(exId){return S.trainings.filter(t=>t.blocks.some(b=>b.kind==='ex'
 function fmtMin(m){if(!m)return '';const h=Math.floor(m/60),r=m%60;return h?`${h} h${r?(' '+String(r).padStart(2,'0')):''}`:`${r} min`}
 
 /* ---------- dessin : rendu ---------- */
-const INK='#1B1D21',DEF='#0E5F73',LINE='rgba(255,255,255,.93)';
+const INK='#1B1D21',DEF='#B4123C',LINE='rgba(255,255,255,.93)';
 function courtD(half){
   const L=420,H=225;let d='';
   const side=s=>{
@@ -366,15 +367,15 @@ function head(p,size,col){
 }
 function trimEnd(p,len){const r=resample(p,4);let acc=0;for(let i=r.length-1;i>0;i--){acc+=Math.hypot(r[i][0]-r[i-1][0],r[i][1]-r[i-1][1]);if(acc>=len)return r.slice(0,i)}return r.slice(0,1).concat([r[r.length-1]])}
 function arrowBody(el){
-  const p=el.pts;if(!p||p.length<2)return '';
-  if(el.type==='main')return `<path d="${smoothD(p)}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const p=el.pts;if(!p||p.length<2)return '';const col=el.side==='def'?DEF:INK;
+  if(el.type==='main')return `<path d="${smoothD(p)}" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
   const body=trimEnd(p,14);
   let s='';
-  if(el.type==='passe')s=`<path d="${smoothD(body)}" fill="none" stroke="${INK}" stroke-width="4" stroke-dasharray="14 10" stroke-linecap="round"/>`;
-  else if(el.type==='depl')s=`<path d="${smoothD(body)}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
-  else if(el.type==='dribble'){const r=resample(body,13);const z=r.map((q,i)=>{if(i===0||i>=r.length-1)return q;const n=normalAt(r,i),k=(i%2?1:-1)*9;return [q[0]+n[0]*k,q[1]+n[1]*k]});s=`<polyline points="${z.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"/>`}
-  else if(el.type==='tir'){const r=resample(body,8);const off=k=>r.map((q,i)=>{const n=normalAt(r,i);return (q[0]+n[0]*k).toFixed(1)+','+(q[1]+n[1]*k).toFixed(1)}).join(' ');s=`<polyline points="${off(6)}" fill="none" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/><polyline points="${off(-6)}" fill="none" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/>`}
-  return s+head(p,el.type==='tir'?24:20,INK);
+  if(el.type==='passe')s=`<path d="${smoothD(body)}" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="14 10" stroke-linecap="round"/>`;
+  else if(el.type==='depl')s=`<path d="${smoothD(body)}" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  else if(el.type==='dribble'){const r=resample(body,13);const z=r.map((q,i)=>{if(i===0||i>=r.length-1)return q;const n=normalAt(r,i),k=(i%2?1:-1)*9;return [q[0]+n[0]*k,q[1]+n[1]*k]});s=`<polyline points="${z.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round"/>`}
+  else if(el.type==='tir'){const r=resample(body,8);const off=k=>r.map((q,i)=>{const n=normalAt(r,i);return (q[0]+n[0]*k).toFixed(1)+','+(q[1]+n[1]*k).toFixed(1)}).join(' ');s=`<polyline points="${off(6)}" fill="none" stroke="${col}" stroke-width="3.4" stroke-linecap="round"/><polyline points="${off(-6)}" fill="none" stroke="${col}" stroke-width="3.4" stroke-linecap="round"/>`}
+  return s+head(p,el.type==='tir'?24:20,col);
 }
 function elBody(el){
   switch(el.type){
@@ -386,10 +387,12 @@ function elBody(el){
     case 'porteur':return `<circle r="24" fill="none" stroke="${INK}" stroke-width="4.5"/><path d="M-12 -12L12 12M12 -12L-12 12" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"/>`;
     case 'def':return `<path d="M-23 9A23 23 0 0 1 23 9" fill="none" stroke="${DEF}" stroke-width="7.5" stroke-linecap="round"/>`;
     case 'texte':{const L=String(el.text||'').split('\n');const y0=-(L.length-1)*13+8;return `<text text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="600" font-size="22" fill="${INK}" stroke="rgba(255,255,255,.88)" stroke-width="6" stroke-linejoin="round" paint-order="stroke">${L.map((l,i)=>`<tspan x="0" y="${y0+i*26}">${esc(l)||' '}</tspan>`).join('')}</text>`}
+    case 'atelier':{const w=atW(el)/AT_K,x0=-w/2,c=el.col||'#E8A914';return `<g transform="scale(${AT_K})"${el.bid?` data-a="openBlkId" data-b="${el.bid}" style="cursor:pointer"`:''}><rect x="${x0}" y="-24" width="${w}" height="48" rx="24" fill="#12151D" stroke="${c}" stroke-width="4"/><circle cx="${x0+24}" cy="0" r="18" fill="${c}"/><text x="${x0+24}" y="7" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="19" font-weight="700" fill="#12151D">${el.num||'?'}</text><text x="${x0+50}" y="7" font-family="Inter,system-ui,sans-serif" font-size="18" font-weight="600" fill="#F4F6F8">${esc(el.label||'Atelier')}</text></g>`}
     case 'ballon':return `<circle r="10" fill="#F97316" stroke="${INK}" stroke-width="2.5"/><path d="M-10 0H10M0 -10V10" stroke="${INK}" stroke-width="1.5"/>`;
   }
   return '';
 }
+const AT_K=1.6;function atW(el){return (64+Math.min(String(el.label||'').length,20)*10.5)*AT_K}
 function txtBox(el){const L=String(el.text||'').split('\n');const mx=Math.max(2,...L.map(l=>l.length));return {w:mx*12.5+24,h:L.length*26+14}}
 const isArrow=t=>['passe','depl','dribble','tir','main'].includes(t);
 function elSvg(el,hit){
@@ -401,6 +404,7 @@ function elSvg(el,hit){
   if(hit){
     if(el.type==='terrain')h=`<path d="${COURT_FULL}" fill="none" stroke="transparent" stroke-width="22" vector-effect="non-scaling-stroke" pointer-events="stroke"/>`;
     else if(el.type==='demi')h=`<g transform="translate(-210 0)"><path d="${COURT_HALF}" fill="none" stroke="transparent" stroke-width="22" vector-effect="non-scaling-stroke" pointer-events="stroke"/></g>`;
+    else if(el.type==='atelier'){const w=atW(el);h=`<rect x="${-w/2}" y="${-26*AT_K}" width="${w}" height="${52*AT_K}" fill="transparent" pointer-events="all"/>`}
     else if(el.type==='texte'){const b=txtBox(el);h=`<rect x="${-b.w/2}" y="${-b.h/2}" width="${b.w}" height="${b.h}" fill="transparent" pointer-events="all"/>`}
     else h=`<circle r="${(SEL_R[el.type]||30)}" fill="transparent" pointer-events="all"/>`;
   }
@@ -434,6 +438,19 @@ function render(top){
 }
 const GRIP=`<span class="grip" role="button" tabindex="0" aria-label="Déplacer (flèches haut et bas au clavier)"><svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></g></svg></span>`;
 const backBtn=()=>`<button type="button" class="ib" data-a="back" aria-label="Retour">${I.back}</button>`;
+
+/* ---------- plan des ateliers (CEC) ---------- */
+const PLAN_POS=[[250,215],[750,215],[250,485],[750,485],[500,350],[500,150],[500,550],[130,350],[870,350]];
+function cecAteliers(t){return t.blocks.filter(b=>{if(b.kind!=='ex')return false;const d=blockData(b);return !(d&&(d.tags||[]).includes('echauffement'))})}
+function syncPlan(t){
+  if(!t.plan||!Array.isArray(t.plan.els))t.plan={els:defaultEls()};
+  const ats=cecAteliers(t),ids=ats.map(b=>b.id);let ch=false;
+  t.plan.els=t.plan.els.filter(e=>{if(e.type!=='atelier')return true;if(ids.includes(e.bid))return true;ch=true;return false});
+  ats.forEach((b,i)=>{let m=t.plan.els.find(e=>e.type==='atelier'&&e.bid===b.id);
+    if(!m){const n=t.plan.els.filter(e=>e.type==='atelier').length;const q=PLAN_POS[n%PLAN_POS.length];m={id:uid(),type:'atelier',bid:b.id,x:q[0]+Math.floor(n/PLAN_POS.length)*36,y:q[1]+Math.floor(n/PLAN_POS.length)*36,rot:0,s:1};t.plan.els.push(m);ch=true}
+    const d=blockData(b),lab=(d&&d.title)||'Atelier',mc=d?mainTag(d.tags):'ne';m.num=i+1;m.label=lab.length>20?lab.slice(0,19)+'…':lab;m.col=HEX[mc]||'#E8A914'});
+  if(ch)save();return t.plan.els;
+}
 
 /* ---------- installation sur le téléphone ---------- */
 let INSTALL_EVT=null;let INSTALL_HELP=false;
@@ -611,6 +628,9 @@ function vSeance(){
    <div><button type="button" class="btn sm bn" data-a="editTr">${I.edit} Modifier les infos</button></div>
   </section>
   <label class="chk c-go" style="border:1px solid var(--go-b);color:var(--go-f)" for="cecbox"><span>Séance CEC (ateliers)<br><span class="small" style="font-weight:400;color:#E8D9A8">Échauffements, puis ateliers en parallèle, puis match</span></span><input type="checkbox" id="cecbox" data-f="tr.cec" ${t.cec?'checked':''}></label>
+  ${t.cec?(()=>{const ats=cecAteliers(t);if(!ats.length)return `<h3 class="sec k-go">Plan des ateliers</h3><div class="empty">Ajoute des ateliers : ils apparaîtront ici, numérotés, sur le plan du gymnase.</div>`;const els=syncPlan(t);return `<h3 class="sec k-go">Plan des ateliers</h3><div data-a="editPlan" role="button" tabindex="0" aria-label="Modifier le plan des ateliers" style="cursor:pointer;border-radius:12px">${drawingSvg(els)}</div>
+  <div class="chips">${ats.map(b=>{const m=els.find(e=>e.type==='atelier'&&e.bid===b.id);return `<button type="button" class="chip" style="background:${m.col}2E;color:${m.col};font-weight:600" data-a="openBlkId" data-b="${b.id}">${m.num} · ${esc(m.label)}</button>`}).join('')}</div>
+  <span class="small mut">Touche le plan pour placer les ateliers et dessiner les rotations. Touche une étiquette pour ouvrir l'atelier.</span>`})():''}
   <h3 class="sec k-cy">Déroulé · ${t.blocks.length} bloc${t.blocks.length>1?'s':''}</h3>
   ${blocks?`<p class="small mut" style="margin:0">Maintiens la poignée ⠿ et fais glisser pour changer l'ordre.</p><div data-sort="blocks" data-group="blocks" style="display:flex;flex-direction:column;gap:12px">${blocks}</div>`:'<div class="empty">Ajoute un échauffement, des exercices et un match.</div>'}
   <div class="grid2"><button type="button" class="btn wide bp" data-a="newEx" data-tr="1">+ Nouvel exercice</button><button type="button" class="btn wide bg" data-a="pickEx">Depuis la bibliothèque</button></div>
@@ -840,6 +860,8 @@ const A={
   blkDel:d=>{const t=trById(R.id);const b=t.blocks[+d.i];if(!b)return;const bd=blockData(b);askConfirm(`Retirer « ${esc(bd&&bd.title||'cet élément')} » de la séance ?${bd&&b.kind==='ex'&&!b.adapt?' L\'exercice reste dans ta bibliothèque.':''}${b.adapt?' Les adaptations faites pour cette séance seront perdues.':''}`,'Retirer',()=>{const i=t.blocks.indexOf(b);if(i>=0)t.blocks.splice(i,1);save()})},
   openBlk:d=>{const t=trById(R.id);const b=t.blocks[+d.i];if(!b)return;if(b.kind==='match'){go('match',{id:b.ref,tid:t.id,bid:b.id})}else go('ex',{id:b.ref,tid:t.id,bid:b.id})},
   pdf:()=>printTr(trById(R.id)),
+  openBlkId:d=>{const t=trById(R.id);if(!t)return;const i=t.blocks.findIndex(b=>b.id===d.b);if(i>=0)A.openBlk({i:String(i)})},
+  editPlan:()=>{const t=trById(R.id);if(!t)return;openEditor(syncPlan(t),els=>{t.plan={els};syncPlan(t);save();render()})},
   pdfPj:()=>printProjet(),
   newEx:d=>{closeSheet(true);sheetNewEx(d.tr==='1'||R.view==='seance')},
   openEx:d=>go('ex',{id:d.id}),
@@ -933,7 +955,7 @@ function printTr(t){
     if(b.kind==='match')return `<div class="pb"><span class="lab">${L}${blockDuration(b)?' · '+blockDuration(b)+' min':''}${(d.themes||[]).length?' · '+esc(d.themes.join(', ')):''}</span><h2>${esc(d.title)}</h2><p><b>${esc(d.rule)}</b></p>${d.consignes?`<p>${esc(d.consignes)}</p>`:''}${d.els?`<div class="pv"><div>${drawingSvg(d.els,'')}</div></div>`:''}</div>`;
     const vs=b.vers==='all'?d.versions:d.versions.filter(v=>b.vers.includes(v.id));
     return `<div class="pb"><span class="lab">${L}${d.duration?' · '+esc(d.duration)+' min':''}${d.players?' · '+esc(d.players)+' joueurs':''}${d.material?' · '+esc(d.material):''}${b.adapt?' · adapté':''}</span><h2>${esc(d.title)}</h2>${vs.map((v,i)=>`<div class="pv" style="${i?'border-top:1px dashed #ccc;padding-top:8px':''}"><div>${vs.length>1?`<p class="lab">${esc(v.name)}${v.change?' — '+esc(v.change):''}</p>`:''}${v.els&&v.els.length?drawingSvg(v.els,''):''}</div><div>${v.deroulement?`<p class="lab">Déroulement</p><p>${esc(v.deroulement)}</p>`:''}${v.rotations?`<p class="lab">Rotations</p><p>${esc(v.rotations)}</p>`:''}${v.challenge?`<p class="lab">Challenge</p><p>${esc(v.challenge)}</p>`:''}${v.consignes?`<p class="lab">Consignes</p><p>${esc(v.consignes)}</p>`:''}</div></div>`).join('')}</div>`}).join('');
-  $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13)}<div style="flex:1"><h1>${esc(t.title||'Séance')}</h1><p>${t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''}${t.players?' · '+esc(t.players)+' joueurs':''}${t.baskets?' · '+esc(t.baskets)+' paniers':''}${trDuration(t)?' · '+fmtMin(trDuration(t)):''}${t.cec?' · CEC':''}${c?' · Cycle '+esc(c.title):''}</p>${t.comment?`<p><i>${esc(t.comment)}</i></p>`:''}</div></div>${parts}`;
+  $('#print').innerHTML=`<div class="ph">${logo(56,S.settings.show13)}<div style="flex:1"><h1>${esc(t.title||'Séance')}</h1><p>${t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''}${t.players?' · '+esc(t.players)+' joueurs':''}${t.baskets?' · '+esc(t.baskets)+' paniers':''}${trDuration(t)?' · '+fmtMin(trDuration(t)):''}${t.cec?' · CEC':''}${c?' · Cycle '+esc(c.title):''}</p>${t.comment?`<p><i>${esc(t.comment)}</i></p>`:''}</div></div>${t.cec&&cecAteliers(t).length?`<div class="pb"><span class="lab">Plan des ateliers</span><div style="margin-top:6px">${drawingSvg(syncPlan(t),'planp')}</div></div>`:''}${parts}`;
   try{window.print()}catch(e){}
 }
 
@@ -962,6 +984,9 @@ const TOOLS=[
  ['def','Défenseur','<path d="M5 15a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'],
  ['ballon','Ballon','<circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/>'],
  '|',
+ ['side:att','Attaque','<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'],
+ ['side:def','Défense','<path d="M5 15a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'],
+ '|',
  ['passe','Passe','<path d="M3 12h14" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/><path d="M16 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2"/>'],
  ['depl','Déplac.','<path d="M3 12h15" stroke="currentColor" stroke-width="2"/><path d="M16 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2"/>'],
  ['dribble','Dribble','<path d="M2 12l3-3 3 6 3-6 3 6 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M18 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.8"/>'],
@@ -971,11 +996,11 @@ const TOOLS=[
  '|',
  ['gomme','Gomme','<path d="M14 4l6 6-9 9H6l-3-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 9l6 6M11 19h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>']
 ];
-function eraseAt(x,y){const D=ED.drag;const t=document.elementFromPoint(x,y);const g=t&&t.closest&&t.closest('#cv [data-id]');if(!g)return;const id=g.dataset.id;if(!ED.els.some(e=>e.id===id))return;if(!D.pushed){pushUndo();D.pushed=true}ED.els=ED.els.filter(e=>e.id!==id);ED.sel=null;edDraw()}
+function eraseAt(x,y){const D=ED.drag;const t=document.elementFromPoint(x,y);const g=t&&t.closest&&t.closest('#cv [data-id]');if(!g)return;const id=g.dataset.id;const ex0=ED.els.find(e=>e.id===id);if(!ex0||ex0.type==='atelier')return;if(!D.pushed){pushUndo();D.pushed=true}ED.els=ED.els.filter(e=>e.id!==id);ED.sel=null;edDraw()}
 const PLACE_S={texte:1,terrain:1,demi:1.2,panier:1.6,plot:1,att:1,porteur:1,def:1,ballon:1};
 function defaultEls(){if(S.settings.gym&&S.settings.gym.length)return clone(S.settings.gym).map(e=>(e.id=uid(),e));return [{id:uid(),type:'terrain',x:500,y:350,rot:0,s:1}]}
 function openEditor(els,onSave){
-  ED={els:els?clone(els):defaultEls(),onSave,tool:'select',sel:null,undo:[],ptrs:new Map(),drag:null,pinch:null,vb:{x:0,y:0,w:1000,h:700},gym:false};
+  ED={els:els?clone(els):defaultEls(),onSave,side:'att',tool:'select',sel:null,undo:[],ptrs:new Map(),drag:null,pinch:null,vb:{x:0,y:0,w:1000,h:700},gym:false};
   const o=document.createElement('div');o.className='ed';o.setAttribute('role','dialog');o.setAttribute('aria-label','Éditeur de schéma');
   o.innerHTML=`<div class="ed-top"><button type="button" class="btn sm bn" data-e="cancel" style="height:44px">Annuler</button><b style="font:600 17px var(--fd)">Schéma</b><button type="button" class="btn sm bp" data-e="save" style="height:44px">Enregistrer</button></div>
   <div class="ed-cv"><svg id="cv" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg><div class="zoom"><button type="button" data-e="zin" aria-label="Zoomer">+</button><button type="button" data-e="zout" aria-label="Dézoomer">−</button><button type="button" data-e="zfit" aria-label="Recadrer" style="font-size:13px">⤢</button></div></div>
@@ -1006,7 +1031,7 @@ function setVB(){const v=ED.vb;ED.svg.setAttribute('viewBox',`${v.x.toFixed(1)} 
 function toSvgXY(cx,cy){const r=ED.svg.getBoundingClientRect();return [ED.vb.x+(cx-r.left)/r.width*ED.vb.w,ED.vb.y+(cy-r.top)/r.height*ED.vb.h]}
 function zoomAt(p,f){const v=ED.vb;const nw=Math.min(4000,Math.max(160,v.w*f));const k=nw/v.w;ED.vb={x:p[0]-(p[0]-v.x)*k,y:p[1]-(p[1]-v.y)*k,w:nw,h:v.h*k};setVB()}
 function edTools(){
-  $('#edtools').innerHTML=TOOLS.map(t=>t==='|'?'<span class="tsep" aria-hidden="true"></span>':`<button type="button" class="tool ${ED.tool===t[0]?'on':''}" data-e="tool" data-t="${t[0]}" aria-pressed="${ED.tool===t[0]}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">${t[2]}</svg>${t[1]}</button>`).join('')+
+  $('#edtools').innerHTML=TOOLS.map(t=>t==='|'?'<span class="tsep" aria-hidden="true"></span>':t[0].slice(0,5)==='side:'?(()=>{const sd=t[0].slice(5),on=ED.side===sd;return `<button type="button" class="tool ${on?'on':''}" data-e="side" data-s="${sd}" aria-pressed="${on}" style="${sd==='def'?'color:#FF6B81;'+(on?'background:#3D1622;outline-color:#FF6B81':''):''}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">${t[2]}</svg>${t[1]}</button>`})():`<button type="button" class="tool ${ED.tool===t[0]?'on':''}" data-e="tool" data-t="${t[0]}" aria-pressed="${ED.tool===t[0]}" style="${ED.side==='def'&&['passe','depl','dribble','tir','main'].includes(t[0])?'color:#FF6B81':''}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">${t[2]}</svg>${t[1]}</button>`).join('')+
   `<span class="tsep" aria-hidden="true"></span><button type="button" class="tool undo" data-e="undo" ${ED.undo.length?'':'disabled style="opacity:.45"'}><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7L4 12l5 5M4 12h11a5 5 0 0 1 0 10h-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Annuler</button>
   <button type="button" class="tool" data-e="gym"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20V9l9-5 9 5v11M3 20h18M9 20v-6h6v6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>Gymnase</button>`;
 }
@@ -1014,9 +1039,10 @@ function edSelBar(){
   const b=$('#edsel');if(!b)return;
   if(ED.gym){b.innerHTML=`<button type="button" class="btn sm bg" data-e="gymSave">Enregistrer comme mon gymnase</button>${S.settings.gym?'<button type="button" class="btn sm bn" data-e="gymLoad">Charger mon gymnase</button>':''}<button type="button" class="btn sm bd" data-e="clearAll">Tout effacer</button><button type="button" class="btn sm bn" data-e="gymClose">Fermer</button>`;return}
   const el=ED.sel&&ED.els.find(e=>e.id===ED.sel);
-  if(!el){const hints={vue:'Glisse pour te déplacer, pince pour zoomer.',select:'Touche un élément pour le déplacer.',passe:'Trace la passe avec le doigt.',depl:'Trace le déplacement.',dribble:'Trace le dribble.',tir:'Trace le tir vers le panier.',main:'Dessine librement.',texte:'Touche le terrain là où tu veux écrire.',gomme:'Touche ou glisse sur un élément pour l\'effacer. Le bouton Annuler le fait revenir.'};b.innerHTML=`<span>${hints[ED.tool]||'Touche le terrain pour placer l\'élément.'}</span>`;return}
+  if(!el){const hints={vue:'Glisse pour te déplacer, pince pour zoomer.',select:'Touche un élément pour le déplacer.',passe:'Trace la passe avec le doigt.',depl:'Trace le déplacement.',dribble:'Trace le dribble.',tir:'Trace le tir vers le panier.',main:'Dessine librement. Choisis Attaque (noir) ou Défense (rouge) avant de tracer.',passe:'Trace la passe avec le doigt.',texte:'Touche le terrain là où tu veux écrire.',gomme:'Touche ou glisse sur un élément pour l\'effacer. Le bouton Annuler le fait revenir.'};b.innerHTML=`<span>${hints[ED.tool]||'Touche le terrain pour placer l\'élément.'}</span>`;return}
+  if(el.type==='atelier'){b.innerHTML=`<span>Atelier ${el.num||''} : fais-le glisser sur son panier ou sa zone.</span><button type="button" class="btn sm bn" data-e="smaller">Taille −</button><button type="button" class="btn sm bn" data-e="bigger">Taille +</button>`;return}
   const sc=['terrain','demi','panier','plot','att','porteur','def','ballon','texte'].includes(el.type);
-  b.innerHTML=`${el.type==='texte'?'<button type="button" class="btn sm bp" data-e="editTxt">Modifier le texte</button>':''}${ROT_R[el.type]?'<span>Poignée cyan : pivoter</span>':''}${sc?'<button type="button" class="btn sm bn" data-e="smaller" aria-label="Réduire">Taille −</button><button type="button" class="btn sm bn" data-e="bigger" aria-label="Agrandir">Taille +</button>':''}<button type="button" class="btn sm bn" data-e="dup">Dupliquer</button><button type="button" class="btn sm bd" data-e="del">Supprimer</button>`;
+  b.innerHTML=`${isArrow(el.type)?`<button type="button" class="btn sm ${el.side==='def'?'bn':'bd'}" data-e="flipSide">${el.side==='def'?'Passer en flèche attaque':'Passer en flèche défense'}</button>`:''}${el.type==='texte'?'<button type="button" class="btn sm bp" data-e="editTxt">Modifier le texte</button>':''}${ROT_R[el.type]?'<span>Poignée cyan : pivoter</span>':''}${sc?'<button type="button" class="btn sm bn" data-e="smaller" aria-label="Réduire">Taille −</button><button type="button" class="btn sm bn" data-e="bigger" aria-label="Agrandir">Taille +</button>':''}<button type="button" class="btn sm bn" data-e="dup">Dupliquer</button><button type="button" class="btn sm bd" data-e="del">Supprimer</button>`;
 }
 function pushUndo(){ED.undo.push(JSON.stringify(ED.els));if(ED.undo.length>80)ED.undo.shift()}
 function selOverlay(el){
@@ -1025,6 +1051,7 @@ function selOverlay(el){
   let s='';const sc=el.s||1;
   if(el.type==='terrain')s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="-432" y="-237" width="864" height="474" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="10 8" vector-effect="non-scaling-stroke"/></g>`;
   else if(el.type==='demi')s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="-222" y="-237" width="444" height="474" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="10 8" vector-effect="non-scaling-stroke"/></g>`;
+  else if(el.type==='atelier'){const w=atW(el);s=`<g transform="translate(${el.x} ${el.y}) scale(${sc})" pointer-events="none"><rect x="${-w/2-6}" y="${-26*AT_K-6}" width="${w+12}" height="${52*AT_K+12}" rx="${30*AT_K}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></g>`}
   else if(el.type==='texte'){const b=txtBox(el);s=`<g transform="translate(${el.x} ${el.y}) rotate(${el.rot||0}) scale(${sc})" pointer-events="none"><rect x="${-b.w/2-4}" y="${-b.h/2-4}" width="${b.w+8}" height="${b.h+8}" rx="6" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" vector-effect="non-scaling-stroke"/></g>`}
   else s=`<circle cx="${el.x}" cy="${el.y}" r="${(SEL_R[el.type]||30)*sc+6}" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="6 5" pointer-events="none"/>`;
   const R0=ROT_R[el.type];
@@ -1036,7 +1063,7 @@ function edDraw(){
   const order=t=>t==='terrain'||t==='demi'?0:t==='panier'||t==='plot'?1:isArrow(t)?2:3;
   const list=ED.els.slice().sort((a,b)=>order(a.type)-order(b.type));
   const sel=ED.sel&&ED.els.find(e=>e.id===ED.sel);
-  let tmp='';if(ED.drag&&ED.drag.kind==='draw'&&ED.drag.pts.length>1)tmp=elSvg({id:'tmp',type:ED.tool,pts:ED.drag.pts},false);
+  let tmp='';if(ED.drag&&ED.drag.kind==='draw'&&ED.drag.pts.length>1)tmp=elSvg({id:'tmp',type:ED.tool,pts:ED.drag.pts,side:ED.side},false);
   ED.svg.innerHTML=`<rect x="-3000" y="-3000" width="7000" height="6700" fill="url(#pq)"/>${list.map(e=>elSvg(e,true)).join('')}${tmp}${sel?selOverlay(sel):''}`;
   edSelBar();
 }
@@ -1074,7 +1101,7 @@ function edUp(e){
   if(D.kind==='place'&&ED.tool==='texte'){if(Math.hypot(e.clientX-D.c[0],e.clientY-D.c[1])<14)openTxt(null,D.p);return}
   if(D.kind==='place'){if(Math.hypot(e.clientX-D.c[0],e.clientY-D.c[1])<14){pushUndo();const el={id:uid(),type:ED.tool,x:Math.round(D.p[0]),y:Math.round(D.p[1]),rot:ED.tool==='def'?180:0,s:PLACE_S[ED.tool]||1};ED.els.push(el);ED.sel=el.id;edTools()}edDraw();return}
   if(D.kind==='draw'){let len=0;for(let i=1;i<D.pts.length;i++)len+=Math.hypot(D.pts[i][0]-D.pts[i-1][0],D.pts[i][1]-D.pts[i-1][1]);
-    if(D.pts.length>=2&&len>24){pushUndo();const pts=resample(D.pts,ED.tool==='main'?5:10).map(q=>[Math.round(q[0]),Math.round(q[1])]);ED.els.push({id:uid(),type:ED.tool,pts});edTools()}edDraw();return}
+    if(D.pts.length>=2&&len>24){pushUndo();const pts=resample(D.pts,ED.tool==='main'?5:10).map(q=>[Math.round(q[0]),Math.round(q[1])]);const st=D.pts[0];let side=ED.side,best=60;ED.els.forEach(q=>{if(['def','att','porteur'].includes(q.type)){const dd=Math.hypot(q.x-st[0],q.y-st[1]);if(dd<best){best=dd;side=q.type==='def'?'def':'att'}}});ED.els.push({id:uid(),type:ED.tool,pts,side});edTools()}edDraw();return}
   if(D.kind==='move'||D.kind==='rot'||D.kind==='erase'){if(D.pushed)edTools();edDraw()}
 }
 function edClick(e){
@@ -1082,13 +1109,15 @@ function edClick(e){
   if(k==='cancel'||k==='save'){const pushed=ED.pushed;closeEditor(k==='save');if(pushed){IGNORE_POP=true;try{history.back()}catch(_){IGNORE_POP=false}}}
   else if(k==='tool'){ED.tool=b.dataset.t;ED.gym=false;if(ED.tool!=='select')ED.sel=null;edTools();edDraw()}
   else if(k==='editTxt'&&el){openTxt(el)}
+  else if(k==='side'){ED.side=b.dataset.s;edTools();edDraw()}
+  else if(k==='flipSide'&&el){pushUndo();el.side=el.side==='def'?'att':'def';edTools();edDraw()}
   else if(k==='txtCancel'){closeTxt()}
   else if(k==='txtOk'){const v=$('#edtxt').value.replace(/\s+$/,'');const T=ED.txt;closeTxt();if(!v.trim()||!T)return;pushUndo();if(T.id){const x=ED.els.find(q=>q.id===T.id);if(x)x.text=v}else{const n={id:uid(),type:'texte',x:Math.round(T.p[0]),y:Math.round(T.p[1]),rot:0,s:1,text:v};ED.els.push(n);ED.sel=n.id}edTools();edDraw()}
   else if(k==='undo'){if(ED.undo.length){ED.els=JSON.parse(ED.undo.pop());ED.sel=null;edTools();edDraw()}}
   else if(k==='zin')zoomAt([ED.vb.x+ED.vb.w/2,ED.vb.y+ED.vb.h/2],0.8);
   else if(k==='zout')zoomAt([ED.vb.x+ED.vb.w/2,ED.vb.y+ED.vb.h/2],1.25);
   else if(k==='zfit'){fitVB()}
-  else if(k==='del'&&el){pushUndo();ED.els=ED.els.filter(x=>x!==el);ED.sel=null;edTools();edDraw()}
+  else if(k==='del'&&el&&el.type!=='atelier'){pushUndo();ED.els=ED.els.filter(x=>x!==el);ED.sel=null;edTools();edDraw()}
   else if(k==='dup'&&el){pushUndo();const c=clone(el);c.id=uid();if(isArrow(c.type))c.pts=c.pts.map(q=>[q[0]+30,q[1]+30]);else{c.x+=30;c.y+=30}ED.els.push(c);ED.sel=c.id;edTools();edDraw()}
   else if((k==='bigger'||k==='smaller')&&el){pushUndo();el.s=Math.max(.3,Math.min(4,(el.s||1)*(k==='bigger'?1.12:0.89)));edTools();edDraw()}
   else if(k==='gym'){ED.gym=!ED.gym;ED.sel=null;edDraw()}
