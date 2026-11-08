@@ -77,6 +77,7 @@ button.chip{height:32px;padding:0 12px;font-size:13px}
 .t-pa{background:var(--pa-t);color:var(--pa)}.t-dr{background:var(--dr-t);color:var(--dr)}.t-ti{background:var(--ti-t);color:var(--ti)}.t-de{background:var(--de-t);color:var(--de)}.t-du{background:var(--du-t);color:var(--du)}.t-ec{background:var(--ec-t);color:var(--ec)}.t-at{background:var(--at-t);color:var(--at)}.t-ma{background:var(--ma-t);color:var(--ma)}.t-pc{background:var(--pc-t);color:var(--pc)}
 .d-pa,.b-pa{background:var(--pa);color:#0B1733}.d-dr,.b-dr{background:var(--dr);color:#1E1440}.d-ti,.b-ti{background:var(--ti);color:#3A0D33}.d-de,.b-de{background:var(--de);color:#3A0A14}.d-du,.b-du{background:var(--du);color:#1A1E26}.d-ec,.b-ec{background:var(--ec);color:#1E2A08}.d-at,.b-at{background:var(--at);color:#3A220E}.d-pc,.b-pc{background:var(--pc);color:#14123D}.d-ma,.b-ma{background:var(--ma);color:#05302A}
 .k-pa{color:var(--pa)}.k-dr{color:var(--dr)}.k-ti{color:var(--ti)}.k-de{color:var(--de)}.k-du{color:var(--du)}.k-ec{color:var(--ec)}.k-at{color:var(--at)}.k-ma{color:var(--ma)}
+.dayb{font-style:italic;font-weight:700!important;letter-spacing:.1em!important;border-radius:6px!important;padding:3px 8px!important}
 .gold{background:var(--go-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 /* effet brillant : un dégradé métallique construit à partir de la couleur --c */
 .bp,.seg button.on,.b-cy,.d-cy,.cal .tr,.b-gr,.d-gr,.b-vi,.b-pa,.d-pa,.b-dr,.d-dr,.b-ti,.d-ti,.b-de,.d-de,.b-du,.d-du,.b-ec,.d-ec,.b-at,.d-at,.b-ma,.d-ma,.b-pc,.d-pc,.cyb,.cybar{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 45%,#fff) 0%,var(--c) 28%,color-mix(in srgb,var(--c) 86%,#000) 52%,color-mix(in srgb,var(--c) 70%,#fff) 76%,color-mix(in srgb,var(--c) 84%,#000) 100%)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,#fff)}
@@ -445,6 +446,18 @@ function render(top){
 const GRIP=`<span class="grip" role="button" tabindex="0" aria-label="Déplacer (flèches haut et bas au clavier)"><svg width="14" height="20" viewBox="0 0 14 20" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></g></svg></span>`;
 const backBtn=()=>`<button type="button" class="ib" data-a="back" aria-label="Retour">${I.back}</button>`;
 
+/* ---------- séances types du cycle (jours) ---------- */
+const DOWS=[[1,'Lundi'],[2,'Mardi'],[3,'Mercredi'],[4,'Jeudi'],[5,'Vendredi'],[6,'Samedi'],[0,'Dimanche']];
+const dayName=dw=>(DOWS.find(x=>x[0]===dw)||[0,''])[1];
+const SCCOL=[['or','Or','#E8A914']].concat(CYCOL);
+const scHex=pl=>(SCCOL.find(x=>x[0]===pl.color)||SCCOL[0])[2];
+const scGold=pl=>!pl.color||pl.color==='or';
+const scBadge=(pl,extra)=>scGold(pl)?`<span class="badge b-go dayb" style="${extra||''}">${dayName(pl.dow).toUpperCase()}</span>`:`<span class="badge cyb dayb" style="--cc:${scHex(pl)};${extra||''}">${dayName(pl.dow).toUpperCase()}</span>`;
+function dayLines(c){const pl=(c.plans||[]);if(!pl.length)return '';return `<div style="display:flex;flex-direction:column;gap:7px;width:100%">${pl.map(x=>`<div style="display:flex;align-items:center;gap:10px;min-width:0">${scBadge(x,'width:86px;text-align:center;flex:none')}<span style="font-size:14px;font-weight:600;min-width:0">${esc(x.title||'—')}</span></div>`).join('')}</div>`}
+function dayTypes(c,trs){const pl=(c.plans||[]);if(!pl.length)return '';const t0=today();
+  return `<h3 class="sec k-go">Sous-cycles</h3><div class="grid2">${pl.map(x=>{let tot=0;if(c.start&&c.end){for(let d=pd(c.start);iso(d)<=c.end;d.setDate(d.getDate()+1))if(d.getDay()===x.dow)tot++}const done=trs.filter(t=>t.date&&t.date<=t0&&pd(t.date).getDay()===x.dow).length;
+  const g=scGold(x);return `<div class="card ${g?'c-go':'cyc'}" style="gap:6px;padding:12px;${g?'':'--cc:'+scHex(x)}">${scBadge(x)}<span class="t15">${esc(x.title||'Sous-cycle à définir')}</span>${x.desc?`<span class="small ${g?'':'cyt'}" style="${g?'color:#E8D9A8;':''}white-space:pre-line">${esc(x.desc)}</span>`:''}${tot?`<span class="small ${g?'':'cyt'}" style="${g?'color:var(--go-f);':''}font-weight:500">${done} / ${tot} faite${done>1?'s':''}</span>`:''}</div>`}).join('')}</div>`}
+
 /* ---------- plan des ateliers (CEC) ---------- */
 const PLAN_POS=[[250,215],[750,215],[250,485],[750,485],[500,350],[500,150],[500,550],[130,350],[870,350]];
 function cecAteliers(t){return t.blocks.filter(b=>{if(b.kind!=='ex')return false;const d=blockData(b);return !(d&&(d.tags||[]).includes('echauffement'))})}
@@ -498,6 +511,7 @@ function cycleHero(c,big){
    <span class="h2">${esc(c.title||'Cycle sans titre')}</span>
    <span class="small cyt">${c.start?dshort(c.start):'?'} – ${c.end?dshort(c.end):'?'}${c.days?' · '+esc(c.days.toLowerCase()):''}</span>
    ${st==='now'&&big?`<div style="display:grid;grid-template-columns:repeat(${w},minmax(0,1fr));gap:5px;width:100%">${Array.from({length:w},(_,i)=>`<div class="bar ${i<now?'cybar':'cybar-off'}"></div>`).join('')}</div>`:''}
+   ${dayLines(c)}
    ${goals.length?`<span class="chips">${goals.map(g=>`<span class="chip cychip">${esc(g)}</span>`).join('')}</span>`:''}
   </button>`;
 }
@@ -567,6 +581,7 @@ function vCycle(){
    ${(c.goals||'').trim()?`<span class="chips">${c.goals.split(',').map(s=>s.trim()).filter(Boolean).map(g=>`<span class="chip cychip">${esc(g)}</span>`).join('')}</span>`:''}
    <span class="small cyt" style="font-weight:500">${c.start?fdate(c.start,{day:'numeric',month:'short'}):'?'} – ${c.end?fdate(c.end,{day:'numeric',month:'short'}):'?'}${c.days?' · '+esc(c.days):''}</span>
   </section>
+  ${dayTypes(c,trs)}
   <div class="seg" role="group" aria-label="Affichage"><button type="button" class="${UI.cal?'':'on'}" data-a="cal" data-v="0">Liste</button><button type="button" class="${UI.cal?'on':''}" data-a="cal" data-v="1">Calendrier</button></div>
   ${body}`;
 }
@@ -794,7 +809,8 @@ function sheetCy(c){
   <label class="fld"><span class="flab">Description et objectif</span><textarea data-f="cyS.description">${esc(c.description)}</textarea></label>
   <label class="fld"><span class="flab">Sous-objectifs (séparés par des virgules)</span><input data-f="cyS.goals" value="${esc(c.goals)}"></label>
   <div class="grid2"><label class="fld"><span class="flab">Début</span><input type="date" data-f="cyS.start" value="${esc(c.start)}"></label><label class="fld"><span class="flab">Fin</span><input type="date" data-f="cyS.end" value="${esc(c.end)}"></label></div>
-  <label class="fld"><span class="flab">Jours de séance</span><input data-f="cyS.days" value="${esc(c.days)}" placeholder="Ex. mardi et jeudi"></label>
+  <div class="fld"><span class="flab">Jours de séance</span><div class="chips" role="group" aria-label="Jours de séance">${DOWS.map(d=>{const on=(c.plans||[]).some(x=>x.dow===d[0]);return `<button type="button" class="chip ${on?'b-go':'off'}" style="${on?'font-weight:600':''}" aria-pressed="${on}" data-a="cyDay" data-d="${d[0]}">${d[1].slice(0,3)}</button>`}).join('')}</div></div>
+  ${(c.plans||[]).map(pl=>`<div class="card c-go">${scBadge(pl)}<div class="fld"><span class="flab" style="color:var(--go)">Couleur du sous-cycle</span><div class="chips" role="group" aria-label="Couleur du sous-cycle du ${dayName(pl.dow)}">${SCCOL.map(x=>{const on=(pl.color||'or')===x[0];return `<button type="button" class="chip ${x[0]==='or'?'b-go':'cyb'}" style="${x[0]==='or'?'':'--cc:'+x[2]+';'}${on?'outline:2px solid #fff;outline-offset:2px':''}" aria-pressed="${on}" data-a="dpColor" data-d="${pl.dow}" data-v="${x[0]}">${x[1]}</button>`}).join('')}</div></div><label class="fld"><span class="flab" style="color:var(--go)">Sous-cycle : titre</span><input data-f="cyDP.${pl.dow}.title" value="${esc(pl.title)}" placeholder="Ex. Sortir le ballon vite"></label><label class="fld"><span class="flab" style="color:var(--go)">Description</span><textarea data-f="cyDP.${pl.dow}.desc" placeholder="Ce qu'on travaille ce jour-là">${esc(pl.desc)}</textarea></label></div>`).join('')}
   <button type="button" class="btn wide bp" data-a="close">Terminé</button>
   <button type="button" class="btn wide bd" data-a="delCy">${I.trash} Supprimer le cycle</button>`);
   SHEET_CY=c.id;
@@ -850,6 +866,8 @@ const A={
   newCycle:()=>{closeSheet(true);const s=monday(today());const c={id:uid(),title:'',description:'',start:s,end:addDays(s,41),days:'',goals:''};c.color=pickCyColor(c);S.cycles.push(c);save();go('cycle',{id:c.id});sheetCy(c)},
   openCy:d=>{closeSheet(true);go('cycle',{id:d.id})},
   editCy:()=>{const c=cyById(R.id);if(c)sheetCy(c)},
+  dpColor:d=>{const c=cyById(SHEET_CY);const pl=c&&(c.plans||[]).find(x=>x.dow===+d.d);if(!pl)return;pl.color=d.v;save();const sc=$('.sheet')&&$('.sheet').scrollTop;closeSheet(true);render();sheetCy(c);if(sc&&$('.sheet'))$('.sheet').scrollTop=sc},
+  cyDay:d=>{const c=cyById(SHEET_CY);if(!c)return;c.plans=c.plans||[];const dw=+d.d;const i=c.plans.findIndex(x=>x.dow===dw);if(i>=0)c.plans.splice(i,1);else c.plans.push({dow:dw,title:'',desc:''});c.plans.sort((a,b)=>((a.dow+6)%7)-((b.dow+6)%7));const n=c.plans.map(x=>dayName(x.dow));c.days=n.length>1?n.slice(0,-1).join(', ')+' et '+n[n.length-1]:(n[0]||'');save();const sc=$('.sheet')&&$('.sheet').scrollTop;closeSheet(true);render();sheetCy(c);if(sc&&$('.sheet'))$('.sheet').scrollTop=sc},
   cyColor:d=>{const c=cyById(SHEET_CY);if(!c)return;c.color=d.v;save();const sc=$('.sheet')&&$('.sheet').scrollTop;closeSheet(true);render();sheetCy(c);if(sc&&$('.sheet'))$('.sheet').scrollTop=sc},
   delCy:()=>{const id=SHEET_CY;askConfirm('Supprimer ce cycle ? Ses séances sont gardées, hors cycle.','Supprimer',()=>{S.cycles=S.cycles.filter(c=>c.id!==id);S.trainings.forEach(t=>{if(t.cycleId===id)t.cycleId=null});save();tab('cycles')})},
   cal:d=>{UI.cal=d.v==='1';render()},
@@ -924,6 +942,7 @@ document.addEventListener('submit',e=>{
     save();closeSheet(true);go('ex',{id:ex.id})}
 });
 function setField(path,val){
+  if(path.slice(0,5)==='cyDP.'){const q=path.split('.');const c=cyById(SHEET_CY);const pl=c&&(c.plans||[]).find(x=>x.dow===+q[1]);if(pl){pl[q[2]]=val;save()}return}
   const [sc,f]=path.split('.');let o=null;
   if(sc==='ex')o=edCtx().obj;
   else if(sc==='ver'){const e=edCtx().obj;o=e&&e.versions.find(v=>v.id===R.vid)}
@@ -1136,7 +1155,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261108095912';
+const APP_VER='20261108103829';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
