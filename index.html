@@ -132,7 +132,8 @@ input:disabled,textarea:disabled{opacity:.9;color:var(--ne-f)}
 .mvb{display:flex;gap:4px;flex:none}
 .grip{width:34px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mut);touch-action:none;cursor:grab;border-radius:8px}
 .grip:focus-visible{outline:2px solid var(--cy)}
-.item .grip{height:36px;width:30px}
+.item .grip{height:36px;width:30px;flex:none!important}
+.item>span:not(.grip){text-align:left}
 .dragging{position:relative;z-index:40;opacity:.95;box-shadow:0 12px 28px rgba(0,0,0,.55);transition:none}
 .dropline{position:fixed;height:3px;border-radius:2px;background:var(--cy);box-shadow:0 0 8px var(--cy);z-index:50;pointer-events:none}
 body.sorting{user-select:none;-webkit-user-select:none}
@@ -326,6 +327,7 @@ const I={
  gear:'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
  up:'<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
  down:'<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+ copy:'<svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.9"/></svg>',
  x:'<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
  chev:'<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
  dots:'<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg>'
@@ -819,7 +821,7 @@ function vProjet(){
   <label class="fld"><span class="flab">Catégorie</span><input data-f="pj.category" value="${esc(P.category)}" placeholder="Ex. U13 garçons"></label>
   <div class="chips" role="group" aria-label="Domaines">${P.domains.map((d,i)=>`<button type="button" class="chip t-${domCol(d.name,i)} ${d.id===UI.dom?'sel':''}" data-a="dom" data-id="${d.id}">${esc(d.name)}</button>`).join('')}<button type="button" class="chip bdash" data-a="addDom">+ Domaine</button></div>
   ${dom?LEVELS.map((L,li)=>{const items=dom.items.filter(x=>x.level===li);return `<section class="card c-${L[1]} lvl"><h2 class="sec k-${L[1]}" style="margin:0">${L[0]}</h2>
-   <div data-sort="lvl" data-group="pj" data-l="${li}" style="display:flex;flex-direction:column;gap:8px;min-height:10px">${items.map(x=>`<div class="item" data-sid="${x.id}" style="background:var(--${L[1]}-t);padding-left:2px">${GRIP}<span>${esc(x.label)}</span><button type="button" data-a="delItem" data-id="${x.id}" aria-label="Retirer ${esc(x.label)}">${I.x}</button></div>`).join('')}</div>
+   <div data-sort="lvl" data-group="pj" data-l="${li}" style="display:flex;flex-direction:column;gap:8px;min-height:10px">${items.map(x=>`<div class="item" data-sid="${x.id}" style="background:var(--${L[1]}-t);padding-left:2px">${GRIP}<span>${esc(x.label)}</span><button type="button" data-a="copyItem" data-id="${x.id}" aria-label="Copier ${esc(x.label)} vers un autre niveau">${I.copy}</button><button type="button" data-a="delItem" data-id="${x.id}" aria-label="Retirer ${esc(x.label)}">${I.x}</button></div>`).join('')}</div>
    <form class="addrow" data-form="item" data-l="${li}"><label style="flex:1;display:flex"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nouvel élément en ${L[0]}</span><input id="add-${li}" placeholder="Ajouter un élément"></label><button type="submit" class="btn sm bp" style="height:44px" aria-label="Ajouter en ${L[0]}">+</button></form></section>`}).join('')
    +(P.domains.length>1?`<button type="button" class="btn sm bd" data-a="delDom" style="align-self:flex-start">${I.trash} Supprimer le domaine « ${esc(dom.name)} »</button>`:''):''}`;
 }
@@ -997,6 +999,9 @@ const A={
   dom:d=>{UI.dom=d.id;render()},
   addDom:()=>openSheet(`<h2 class="h2">Nouveau domaine</h2><form data-form="dom" style="display:flex;flex-direction:column;gap:12px"><label class="fld"><span class="flab">Nom</span><input id="ndom" placeholder="Ex. Rebond" data-focus="1"></label><button type="submit" class="btn wide bp">Ajouter</button></form>`),
   delDom:()=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);askConfirm(`Supprimer le domaine « ${esc(dm.name)} » et ses éléments ?`,'Supprimer',()=>{S.projet.domains=S.projet.domains.filter(x=>x.id!==dm.id);UI.dom=null;save()})},
+  copyItem:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);const it=dm&&dm.items.find(x=>x.id===d.id);if(!it)return;
+    openSheet(`<h2 class="h2">Copier « ${esc(it.label)} »</h2><p class="small mut" style="margin:0">Choisis le niveau où l'ajouter aussi. L'élément reste aussi en ${LEVELS[it.level][0].toLowerCase()}.</p>${LEVELS.map((L,li)=>{if(li===it.level)return '';const has=dm.items.some(x=>x.level===li&&norm(x.label)===norm(it.label));return `<button type="button" class="opt c-${L[1]}" style="border:1px solid var(--${L[1]}-b)" data-a="copyItemTo" data-id="${it.id}" data-l="${li}" ${has?'disabled':''}><span class="lbl b-${L[1]}" style="width:auto;padding:4px 10px">${L[0].toUpperCase()}</span><span>${has?'Déjà présent dans ce niveau':'Copier ici'}</span></button>`}).join('')}<button type="button" class="btn wide bn" data-a="close">Annuler</button>`)},
+  copyItemTo:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);const it=dm&&dm.items.find(x=>x.id===d.id);if(!it)return;const l=+d.l;const same=dm.items.filter(x=>x.level===l);const n={id:uid(),label:it.label,level:l};if(same.length)dm.items.splice(dm.items.indexOf(same[same.length-1])+1,0,n);else dm.items.push(n);save();closeSheet()},
   delItem:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);const it=dm.items.find(x=>x.id===d.id);if(!it)return;askConfirm(`Supprimer « ${esc(it.label)} » du projet pédagogique ?`,'Supprimer',()=>{dm.items=dm.items.filter(x=>x.id!==d.id);save()})},
   exportData:()=>{const data=JSON.stringify(S);let ok=false;try{const b=new Blob([data],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='coachco-sauvegarde-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();ok=true}catch(e){}
     const o=$('#expout');if(o)o.innerHTML=`<p class="small mut" style="margin:0">${ok?'Si le fichier ne s\'est pas téléchargé, copie le texte ci-dessous et garde-le dans tes notes.':'Copie ce texte et garde-le dans tes notes.'}</p><textarea readonly style="min-height:90px;font-size:11px" id="exptxt">${esc(data)}</textarea><button type="button" class="btn sm bn" data-a="copyExp">Copier le texte</button>`},
@@ -1266,7 +1271,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261109224023';
+const APP_VER='20261109224349';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
