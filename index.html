@@ -743,9 +743,11 @@ function vBiblio(){
     <div class="chips"><button type="button" class="chip ${UI.tag==='all'?'':'off'}" style="${UI.tag==='all'?'background:var(--fg);color:var(--bg);font-weight:600':''}" data-a="ftag" data-k="all">Tous</button>${TAGS.map(t=>`<button type="button" class="chip t-${t[2]} ${UI.tag===t[0]?'sel':''}" data-a="ftag" data-k="${t[0]}">${t[1]}</button>`).join('')}</div>
     <div id="exlist" style="display:flex;flex-direction:column;gap:10px">${exList()}</div>`;
   }else if(UI.bib==='tr'){
-    const list=S.trainings.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-    body=`<p class="small mut" style="margin:0">Toutes tes séances complètes, avec leurs exercices. Réutilise-en une comme modèle : la copie n'a ni date ni cycle.</p>`+
-    (list.map(t=>`<div class="row c-go" style="flex-wrap:wrap"><div class="grow"><span class="t15">${esc(t.title||'Sans titre')}</span><span class="small" style="color:#F3DC9A">${t.blocks.length} blocs${trDuration(t)?' · '+fmtMin(trDuration(t)):''}${t.cec?' · CEC':''}</span><span class="chips">${(t.tags||[]).slice(0,3).map(chip).join('')}</span></div><div style="display:flex;gap:6px"><button type="button" class="btn sm bn" data-a="openTr" data-id="${t.id}">Voir</button><button type="button" class="btn sm bp" data-a="reuseTr" data-id="${t.id}">Réutiliser</button></div></div>`).join('')||'<div class="empty">Tes séances apparaîtront ici.</div>');
+    const sig=t=>JSON.stringify([!!t.cec,t.blocks.map(x=>[x.kind,x.ref,x.vers,x.adapt?JSON.stringify(x.adapt):'',x.duration||''])]);
+    const groups=new Map();S.trainings.filter(t=>t.blocks.length).forEach(t=>{const k=sig(t);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(t)});
+    const list=[...groups.values()].map(g=>{const t=g[0];t._uses=g.map(x=>x.date).filter(Boolean).sort();t._n=g.length;t._last=t._uses[t._uses.length-1]||'';return t}).sort((a,b)=>(b._last||'').localeCompare(a._last||''));
+    body=`<p class="small mut" style="margin:0">Tes séances avec leurs exercices, une seule fois chacune : une séance dupliquée sans changer ses exercices est regroupée avec l'originale.</p>`+
+    (list.map(t=>`<div class="row c-go" style="flex-wrap:wrap"><div class="grow"><span class="t15">${esc(t.title||'Sans titre')}</span><span class="small" style="color:#F3DC9A">${t.blocks.length} blocs${trDuration(t)?' · '+fmtMin(trDuration(t)):''}${t.cec?' · CEC':''}${t._n>1?` · utilisée ${t._n} fois${t._uses.length?' ('+t._uses.map(d=>dshort(d)).join(', ')+')':''}`:''}</span><span class="chips">${(t.tags||[]).slice(0,3).map(chip).join('')}</span></div><div style="display:flex;gap:6px"><button type="button" class="btn sm bn" data-a="openTr" data-id="${t.id}">Voir</button><button type="button" class="btn sm bp" data-a="reuseTr" data-id="${t.id}">Réutiliser</button></div></div>`).join('')||'<div class="empty">Tes séances apparaîtront ici.</div>');
   }else{
     add=`<button type="button" class="btn bp" data-a="newMa">+ Match</button>`;
     const sel=UI.theme&&S.themes.includes(UI.theme)?UI.theme:S.themes[0];
@@ -1264,7 +1266,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261109215939';
+const APP_VER='20261109224023';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
