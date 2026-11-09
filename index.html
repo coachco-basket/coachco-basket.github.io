@@ -823,8 +823,7 @@ function vProjet(){
   const dom=P.domains.find(d=>d.id===UI.dom);
   return `<header class="hdr"><div class="grow"><h1 class="h1">Projet <span style="color:var(--cy)">pédagogique</span></h1><span class="small" style="color:var(--go-f)">Projet technique de la saison</span></div><button type="button" class="btn sm bg" data-a="pdfPj" style="height:44px">PDF</button></header>
   <label class="fld"><span class="flab">Catégorie</span><input data-f="pj.category" value="${esc(P.category)}" placeholder="Ex. U13 garçons"></label>
-  <div class="chips" role="group" aria-label="Domaines">${P.domains.map((d,i)=>{const h=domHex(d);return `<button type="button" class="chip ${d.id===UI.dom?'sel':''}" style="background:color-mix(in srgb,${h} 24%,#12151D);color:${h}" data-a="dom" data-id="${d.id}">${esc(d.name)}</button>`}).join('')}<button type="button" class="chip bdash" data-a="addDom">+ Domaine</button></div>
-  ${dom?`<div class="fld"><span class="flab">Couleur de « ${esc(dom.name)} »</span><div class="chips" role="group" aria-label="Couleur du domaine">${DPAL.map(x=>{const on=domHex(dom)===x[2];const other=S.projet.domains.some(o=>o!==dom&&o.color===x[0]);return `<button type="button" data-a="domColor" data-v="${x[0]}" aria-label="${x[1]}${other?' (déjà utilisée)':''}" aria-pressed="${on}" title="${x[1]}" style="width:34px;height:34px;border-radius:17px;background:${x[2]};border:${on?'3px solid #fff':'2px solid transparent'};opacity:${other&&!on?.35:1}"></button>`}).join('')}</div></div>`:''}
+  <div class="chips" role="group" aria-label="Domaines">${P.domains.map((d,i)=>{const h=domHex(d);return `<button type="button" class="chip ${d.id===UI.dom?'sel':''}" style="background:color-mix(in srgb,${h} 24%,#12151D);color:${h}" data-a="dom" data-id="${d.id}">${esc(d.name)}</button>`}).join('')}<button type="button" class="chip bdash" data-a="addDom">+ Domaine</button>${dom?`<button type="button" class="chip off" data-a="domSet" aria-label="Réglages du domaine ${esc(dom.name)}" style="gap:6px"><span style="width:12px;height:12px;border-radius:6px;background:${domHex(dom)}"></span>${I.gear.replace('width="20" height="20"','width="16" height="16"')}</button>`:''}</div>
   ${dom?LEVELS.map((L,li)=>{const items=dom.items.filter(x=>x.level===li);return `<section class="card c-${L[1]} lvl"><h2 class="sec k-${L[1]}" style="margin:0">${L[0]}</h2>
    <div data-sort="lvl" data-group="pj" data-l="${li}" style="display:flex;flex-direction:column;gap:8px;min-height:10px">${items.map(x=>`<div class="item" data-sid="${x.id}" style="background:var(--${L[1]}-t);padding-left:2px">${GRIP}<span>${esc(x.label)}</span><button type="button" data-a="copyItem" data-id="${x.id}" aria-label="Copier ${esc(x.label)} vers un autre niveau">${I.copy}</button><button type="button" data-a="delItem" data-id="${x.id}" aria-label="Retirer ${esc(x.label)}">${I.x}</button></div>`).join('')}</div>
    <form class="addrow" data-form="item" data-l="${li}"><label style="flex:1;display:flex"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nouvel élément en ${L[0]}</span><input id="add-${li}" placeholder="Ajouter un élément"></label><button type="submit" class="btn sm bp" style="height:44px" aria-label="Ajouter en ${L[0]}">+</button></form></section>`}).join('')
@@ -1003,7 +1002,11 @@ const A={
   pkMa:d=>{const m=maById(d.id);setSheet(`<h2 class="h2">${esc(m.title||'Match')}</h2><p class="small" style="margin:0;color:var(--go-f)">${esc(m.rule||'')}</p><form data-form="madur" data-id="${m.id}" style="display:flex;flex-direction:column;gap:12px"><label class="fld"><span class="flab">Durée du match dans cette séance (min)</span><input id="mdur" inputmode="numeric" value="${esc(m.duration||'')}" placeholder="Ex. 15" autocomplete="off"></label><p class="small mut" style="margin:0">Elle compte dans le temps total de la séance.</p><button type="submit" class="btn wide bp">Ajouter à la séance</button></form>`);const i=$('#mdur');if(i)i.focus()},
   dom:d=>{UI.dom=d.id;render()},
   addDom:()=>openSheet(`<h2 class="h2">Nouveau domaine</h2><form data-form="dom" style="display:flex;flex-direction:column;gap:12px"><label class="fld"><span class="flab">Nom</span><input id="ndom" placeholder="Ex. Rebond" data-focus="1"></label><button type="submit" class="btn wide bp">Ajouter</button></form>`),
-  domColor:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);if(!dm)return;dm.color=d.v;save();render()},
+  domSet:()=>{const dom=S.projet.domains.find(x=>x.id===UI.dom);if(!dom)return;openSheet(`<h2 class="h2">Réglages du domaine</h2>
+    <label class="fld"><span class="flab">Nom</span><input data-f="pjd.name" value="${esc(dom.name)}"></label>
+    <div class="fld"><span class="flab">Couleur</span><div class="chips" role="group" aria-label="Couleur du domaine">${DPAL.map(x=>{const on=domHex(dom)===x[2];const other=S.projet.domains.some(o=>o!==dom&&o.color===x[0]);return `<button type="button" data-a="domColor" data-v="${x[0]}" aria-label="${x[1]}${other?' (déjà utilisée)':''}" aria-pressed="${on}" title="${x[1]}" style="width:40px;height:40px;border-radius:20px;background:${x[2]};border:${on?'3px solid #fff':'2px solid transparent'};opacity:${other&&!on?.35:1}"></button>`}).join('')}</div><span class="small mut">Les couleurs grisées sont déjà utilisées par un autre domaine.</span></div>
+    <button type="button" class="btn wide bp" data-a="close">Terminé</button>`)},
+  domColor:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);if(!dm)return;dm.color=d.v;save();A.domSet()},
   delDom:()=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);askConfirm(`Supprimer le domaine « ${esc(dm.name)} » et ses éléments ?`,'Supprimer',()=>{S.projet.domains=S.projet.domains.filter(x=>x.id!==dm.id);UI.dom=null;save()})},
   copyItem:d=>{const dm=S.projet.domains.find(x=>x.id===UI.dom);const it=dm&&dm.items.find(x=>x.id===d.id);if(!it)return;
     openSheet(`<h2 class="h2">Copier « ${esc(it.label)} »</h2><p class="small mut" style="margin:0">Choisis le niveau où l'ajouter aussi. L'élément reste aussi en ${LEVELS[it.level][0].toLowerCase()}.</p>${LEVELS.map((L,li)=>{if(li===it.level)return '';const has=dm.items.some(x=>x.level===li&&norm(x.label)===norm(it.label));return `<button type="button" class="opt c-${L[1]}" style="border:1px solid var(--${L[1]}-b)" data-a="copyItemTo" data-id="${it.id}" data-l="${li}" ${has?'disabled':''}><span class="lbl b-${L[1]}" style="width:auto;padding:4px 10px">${L[0].toUpperCase()}</span><span>${has?'Déjà présent dans ce niveau':'Copier ici'}</span></button>`}).join('')}<button type="button" class="btn wide bn" data-a="close">Annuler</button>`)},
@@ -1043,6 +1046,7 @@ function setField(path,val){
   else if(sc==='ma')o=maById(R.id);
   else if(sc==='mblk'){const t=trById(R.tid);o=t&&t.blocks.find(x=>x.id===R.bid)}
   else if(sc==='pj')o=S.projet;
+  else if(sc==='pjd')o=S.projet.domains.find(x=>x.id===UI.dom);
   else if(sc==='set')o=S.settings;
   if(!o)return;if((sc==='ex'||sc==='ver')&&edCtx().ro)return;
   if(sc==='trS'&&f==='cycleId')val=val||null;
@@ -1278,7 +1282,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261109225210';
+const APP_VER='20261109225504';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
