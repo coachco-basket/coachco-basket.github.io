@@ -243,7 +243,9 @@ nav.tabs button.on span{background:var(--cy-t)}
   #print .sb b{display:block;font:700 15pt/1 var(--fd);color:#FFD54F;font-variant-numeric:tabular-nums}
   #print .sb span{display:block;font-size:7pt;letter-spacing:.1em;text-transform:uppercase;color:#8A93A3;margin-top:3px}
   #print .hd2 .row2{position:relative;display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:9px;border-top:1px solid #262C38}
-  #print .pos{position:relative;overflow:hidden;border-radius:14px;margin-bottom:12px;color:#fff;min-height:200px;background:#0B0D12}
+  #print .pos{position:relative;overflow:hidden;border-radius:14px;margin-bottom:12px;color:#fff;min-height:200px;background:#0B0D12;display:flex;flex-direction:column}
+  #print .pos .lt{margin-top:auto!important}
+  #print .pos .in{padding-bottom:14px!important}
   #print .pos .bgw{position:absolute;inset:0;width:100%;height:100%}
   #print .pos .shade{position:absolute;inset:0;background:linear-gradient(100deg,rgba(11,13,18,.97) 0%,rgba(11,13,18,.9) 46%,rgba(11,13,18,.45) 75%,rgba(11,13,18,.15) 100%)}
   #print .pos .stripe{position:absolute;top:0;bottom:0;right:120px;width:46px;transform:skewX(-18deg);opacity:.9}
@@ -630,7 +632,7 @@ function vCycles(){
   const g={now:[],future:[],past:[]};S.cycles.forEach(c=>g[cycleStatus(c)].push(c));
   g.future.sort((a,b)=>(a.start||'').localeCompare(b.start||''));g.past.sort((a,b)=>(b.start||'').localeCompare(a.start||''));
   const list=(arr,big)=>arr.map(c=>cycleHero(c,big)).join('');
-  return `<header class="hdr"><h1 class="h1 grow">Cycles</h1><button type="button" class="btn bp" data-a="newCycle">+ Cycle</button></header>
+  return `<header class="hdr"><h1 class="h1 grow">Cycles</h1>${S.cycles.length?'<button type="button" class="btn sm bg" data-a="pdfProg" style="height:44px">PDF</button>':''}<button type="button" class="btn bp" data-a="newCycle">+ Cycle</button></header>
   ${g.now.length?`<h3 class="sec k-go">En cours</h3>${list(g.now,true)}`:''}
   ${g.future.length?`<h3 class="sec k-cy">À venir</h3>${list(g.future,false)}`:''}
   ${g.past.length?`<h3 class="sec k-mut">Passés</h3>${list(g.past,false)}`:''}
@@ -973,6 +975,7 @@ const A={
   openBlkId:d=>{const t=trById(R.id);if(!t)return;const i=t.blocks.findIndex(b=>b.id===d.b);if(i>=0)A.openBlk({i:String(i)})},
   editPlan:()=>{const t=trById(R.id);if(!t)return;openEditor(syncPlan(t),els=>{t.plan={els};syncPlan(t);save();render()})},
   pdfPj:()=>printProjet(),
+  pdfProg:()=>printProg(),
   newEx:d=>{closeSheet(true);sheetNewEx(d.tr==='1'||R.view==='seance')},
   openEx:d=>go('ex',{id:d.id}),
   delEx:()=>{const e=exById(R.id);const u=usage(e.id);askConfirm(`Supprimer « ${esc(e.title)} » de la bibliothèque ?${u?` Il est utilisé dans ${u} séance${u>1?'s':''} et en sera retiré.`:''}`,'Supprimer',()=>{S.exercises=S.exercises.filter(x=>x.id!==e.id);S.trainings.forEach(t=>t.blocks=t.blocks.filter(b=>!(b.kind==='ex'&&b.ref===e.id&&!b.adapt)));save();back()})},
@@ -1099,6 +1102,42 @@ function printTr(t){
 }
 
 const HEX={pa:'#6EA8FF',dr:'#B794FF',ti:'#F07CE4',de:'#FF6B81',at:'#E2AC7E',du:'#B8BFCB',ec:'#9CCB3F',gr:'#4ADE80',cy:'#06B6D4',go:'#E8A914'};
+function printProg(){
+  const cys=S.cycles.filter(c=>c.start&&c.end).sort((a,b)=>a.start.localeCompare(b.start));
+  const ref=cys.length?pd(cys[0].start):new Date();const y=ref.getMonth()>=7?ref.getFullYear():ref.getFullYear()-1;
+  const s0=new Date(y,8,1,12),s1=new Date(y+1,5,30,12);const lo=new Date(Math.min(s0,cys.length?pd(cys[0].start):s0)),hi=new Date(Math.max(s1,...cys.map(c=>pd(c.end))));
+  const span=(hi-lo)/864e5;const pos=d=>Math.max(0,Math.min(100,(pd(d)-lo)/864e5/span*100));
+  const months=[];for(let m=new Date(lo.getFullYear(),lo.getMonth(),1,12);m<=hi;m=new Date(m.getFullYear(),m.getMonth()+1,1,12)){const a=Math.max(0,(m-lo)/864e5/span*100);const n=new Date(m.getFullYear(),m.getMonth()+1,1,12);const b=Math.min(100,(n-lo)/864e5/span*100);months.push([a,b,m.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')])}
+  const trs=S.trainings.filter(t=>t.cycleId&&t.date);const weeks=cys.reduce((n,c)=>n+cycleWeeks(c),0);
+  const wood=`<svg class="bgw" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="260" fill="url(#pq)"/><g fill="none" stroke="#fff" stroke-width="5" opacity=".85"><circle cx="760" cy="130" r="70"/><path d="M760 -10V270"/><circle cx="760" cy="130" r="16"/><path d="M520 -10V60A80 80 0 0 0 520 200V270" opacity=".6"/></g></svg>`;
+  const head=`<div class="pos">${wood}<div class="shade"></div><div class="stripe" style="background:#4F8DFF"></div><div class="stripe2"></div><div class="lg2">${logo(40,S.settings.show13,1)}</div>
+  <div class="in"><div class="dt"><small>SAISON</small><b style="font-size:15pt;margin:7px 0 5px;white-space:nowrap;letter-spacing:-.02em">${String(y).slice(2)}-${String(y+1).slice(2)}</b><small>${y}</small></div>
+  <div style="flex:1;min-width:0;padding-right:70px"><div><span class="tg2" style="background:linear-gradient(135deg,#FFF3C4,#FFD54F 30%,#E8A914 60%,#FFE38A);color:#2E2205">PROGRAMMATION</span>${S.projet.category?`<span class="tg2" style="background:#22D3EE;color:#052A31">${esc(S.projet.category.toUpperCase())}</span>`:''}</div>
+  <h1>La saison en cycles</h1><div class="cm2">Les cycles de l'année, leurs objectifs et leurs séances.</div></div></div>
+  <div class="lt"><div class="st"><b>${cys.length}</b><span>CYCLES</span></div><div class="st"><b>${weeks}</b><span>SEMAINES</span></div><div class="st"><b>${trs.length}</b><span>SÉANCES PRÉVUES</span></div><div class="sc">${S.settings.coach?`<span>COACH</span><b>${esc(S.settings.coach)}</b>`:''}</div></div></div>`;
+  const grad=c=>`linear-gradient(135deg,color-mix(in srgb,${c} 50%,#fff) 0%,${c} 32%,color-mix(in srgb,${c} 78%,#000) 70%,color-mix(in srgb,${c} 88%,#fff) 100%)`;
+  const tl=`<div class="sec2">Calendrier de la saison</div><div class="bk" style="padding:12px 14px 10px">
+  <div style="position:relative">${months.map((m,k)=>`<span style="position:absolute;top:0;bottom:0;left:${m[0]}%;width:${m[1]-m[0]}%;background:${k%2?'#F6F7FA':'#fff'}"></span>`).join('')}
+  <div style="position:relative;height:22px">${months.map(m=>`<span style="position:absolute;left:${m[0]}%;width:${m[1]-m[0]}%;top:4px;text-align:center;font:700 7.5pt var(--ff);letter-spacing:.1em;text-transform:uppercase;color:#5A6372">${m[2]}</span>`).join('')}</div>
+  <div style="position:relative;padding:4px 0 2px">${cys.map((c,i)=>{const a=pos(c.start),b=pos(c.end),w=Math.max(b-a,2),inside=w>26,right=b<62;const lab=`${esc(c.title||'Cycle')}`;
+    return `<div style="position:relative;height:28px;margin-bottom:6px"><div style="position:absolute;left:${a}%;width:${w}%;top:0;bottom:0;border-radius:14px;background:${grad(cyCol(c))};box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 5px rgba(15,20,30,.18);display:flex;align-items:center;gap:7px;padding:0 4px;overflow:hidden"><span style="flex:none;width:20px;height:20px;border-radius:10px;background:#12151D;color:#fff;font:700 8.5pt var(--fd);display:flex;align-items:center;justify-content:center">${i+1}</span>${inside?`<span style="font:700 8pt var(--ff);color:#0B1020;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lab}</span>`:''}</div>${inside?'':`<span style="position:absolute;top:0;bottom:0;display:flex;align-items:center;white-space:nowrap;font:600 8.5pt var(--ff);color:#12151D;${right?`left:calc(${b}% + 8px)`:`right:calc(${100-a}% + 8px)`}">${lab}</span>`}</div>`}).join('')}</div></div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:8px;padding-top:8px;border-top:1px solid #E5E8EE">${cys.map((c,i)=>`<span style="display:flex;align-items:center;gap:6px;font-size:8pt;color:#3B4352"><span style="width:10px;height:10px;border-radius:5px;background:${cyCol(c)}"></span><b>${i+1}.</b> ${dshort(c.start)} – ${dshort(c.end)} · ${cycleWeeks(c)} sem.</span>`).join('')}</div></div>`;
+  const cards=cys.map((c,i)=>{const ts=trs.filter(t=>t.cycleId===c.id).sort((a,b)=>a.date.localeCompare(b.date));const col=cyCol(c);const goals=(c.goals||'').split(',').map(x=>x.trim()).filter(Boolean);const W=cycleWeeks(c),m0=monday(c.start);
+    const strip=Array.from({length:W},(_,k)=>{const ws=addDays(m0,k*7),we=addDays(ws,6);const n=ts.filter(t=>t.date>=ws&&t.date<=we).length;return `<div style="flex:1;min-width:0;text-align:center"><div style="height:16px;border-radius:5px;background:${n?grad(col):'#EEF0F4'};display:flex;align-items:center;justify-content:center;gap:2px">${'<i style="width:4px;height:4px;border-radius:2px;background:#12151D;display:block"></i>'.repeat(Math.min(n,4))}</div><span style="font-size:6.5pt;color:#8A93A3;letter-spacing:.06em">S${k+1}</span></div>`}).join('');
+    return `<div class="bk" style="display:flex;padding:0">
+    <div style="flex:none;width:74px;background:${grad(col)};color:#0B1020;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px 0"><span style="font:700 6.5pt var(--ff);letter-spacing:.16em">CYCLE</span><span style="font:700 28pt/1 var(--fd)">${i+1}</span><span style="font:700 7pt var(--ff);letter-spacing:.1em">${W} SEM.</span></div>
+    <div style="flex:1;min-width:0;padding:11px 14px 12px;display:flex;flex-direction:column;gap:8px">
+     <div><div style="font:700 13.5pt/1.2 var(--fd);color:#12151D">${esc(c.title||'Cycle sans titre')}</div><div style="font:600 8.5pt var(--ff);color:#5A6372;margin-top:2px;letter-spacing:.02em">${fdate(c.start,{day:'numeric',month:'long'})} → ${fdate(c.end,{day:'numeric',month:'long',year:'numeric'})}${c.days?' · '+esc(c.days):''}</div></div>
+     ${c.description?`<p style="margin:0;font-size:9.5pt;line-height:1.45;color:#2B3240;white-space:pre-line">${esc(c.description)}</p>`:''}
+     ${(c.plans||[]).length?`<div style="display:grid;grid-template-columns:repeat(${Math.min(c.plans.length,2)},minmax(0,1fr));gap:6px">${c.plans.map(pl=>{const h=scHex(pl);return `<div style="border-radius:9px;padding:7px 9px 8px;background:color-mix(in srgb,${h} 9%,#fff);border:1px solid color-mix(in srgb,${h} 30%,#fff);border-left:4px solid ${h};min-width:0;break-inside:avoid"><div style="display:flex;align-items:center;gap:7px;min-width:0"><span class="tg" style="background:${grad(h)};color:#12151D;min-width:0;font-style:italic;flex:none">${dayName(pl.dow).toUpperCase()}</span><span style="font:700 9pt/1.25 var(--ff);color:#12151D;min-width:0">${esc(pl.title||'Sous-cycle')}</span></div>${pl.desc?`<div style="font-size:8.5pt;line-height:1.4;color:#3B4352;margin-top:4px;white-space:pre-line">${esc(pl.desc)}</div>`:''}</div>`}).join('')}</div>`:''}
+     ${goals.length?`<div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px"><span style="font:700 6.5pt var(--ff);letter-spacing:.14em;color:#8A93A3;margin-right:2px">OBJECTIFS</span>${goals.map(g=>`<span style="border-radius:8px;padding:3px 9px;font-size:8.5pt;font-weight:600;background:color-mix(in srgb,${col} 14%,#fff);color:#12151D">${esc(g)}</span>`).join('')}</div>`:''}
+     <div><div style="display:flex;gap:3px">${strip}</div></div>
+     ${ts.length?`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 14px;padding-top:7px;border-top:1px solid #EEF0F4">${ts.map(t=>`<div style="display:flex;gap:7px;font-size:8.5pt;line-height:1.35;min-width:0"><span style="flex:none;width:46px;color:#8A93A3;font-weight:600">${pd(t.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}).replace('.','')}</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title||'Séance')}${t.cec?' <b style="color:#B7791F">· CEC</b>':''}</span></div>`).join('')}</div>`:'<div style="font-size:8.5pt;color:#A0A7B4;padding-top:7px;border-top:1px solid #EEF0F4">Aucune séance prévue pour l\'instant</div>'}
+    </div></div>`}).join('');
+  $('#print').innerHTML=`${head}${cys.length?tl:''}<div class="sec2">Les cycles</div>${cards||'<p>Aucun cycle daté.</p>'}`;
+  try{window.print()}catch(e){}
+}
+
 function printProjet(){
   const P=S.projet;const LC=['#15803D','#0E7490','#B7791F'];
   const now=new Date(),y=now.getMonth()>=7?now.getFullYear():now.getFullYear()-1;
@@ -1282,7 +1321,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261109225504';
+const APP_VER='20261110000901';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
