@@ -1072,6 +1072,9 @@ document.addEventListener('change',e=>{
 });
 
 /* ---------- impression PDF ---------- */
+function runHead(l,r){const q=x=>'"'+String(x||'').replace(/\\/g,'').replace(/"/g,'\\"').replace(/\n/g,' ')+'"';let st=document.getElementById('runh');if(!st){st=document.createElement('style');st.id='runh';document.head.appendChild(st)}
+  const box='vertical-align:bottom;padding-bottom:2.2mm;border-bottom:0.6pt solid #3A4252;font:8pt Inter,sans-serif;';
+  st.textContent=`@media print{@page{margin-top:19mm;@top-left{content:${q('COACHCO  ·  '+l.toUpperCase())};${box}font-weight:700;letter-spacing:.12em;color:#F2B70F;font-size:7.5pt}@top-center{content:"";${box}}@top-right{content:${q(r)};${box}color:#8A93A3;font-size:8pt}}@page:first{margin-top:11mm;@top-left{content:none;border:0}@top-center{content:none;border:0}@top-right{content:none;border:0}}}`}
 function printTr(t){
   if(!t)return;const c=t.cycleId&&cyById(t.cycleId);
   const TC={'ÉCH.':['Échauffement','#4D7C0F'],'EX.':['Exercice','#0E7490'],'ATELIER':['Atelier','#B7791F'],'MATCH':['Match','#0F766E']};
@@ -1089,6 +1092,7 @@ function printTr(t){
   const dur=trDuration(t),eb=['Séance'+(t.cec?' CEC':''),t.date?fdate(t.date,{weekday:'long',day:'numeric',month:'long',year:'numeric'}):''].filter(Boolean).join(' · ');
   const dd=t.date?pd(t.date):null,cc=c?cyCol(c):'#22D3EE';
   const wood=`<svg class="bgw" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="900" height="260" fill="url(#pq)"/><g fill="none" stroke="#fff" stroke-width="5" opacity=".85"><circle cx="760" cy="130" r="70"/><path d="M760 -10V270"/><circle cx="760" cy="130" r="16"/><path d="M520 -10V60A80 80 0 0 0 520 200V270" opacity=".6"/></g></svg>`;
+  runHead('Séance'+(t.cec?' CEC':''),[t.title||'Séance',t.date?fdate(t.date,{day:'numeric',month:'long',year:'numeric'}):''].filter(Boolean).join(' · '));
   $('#print').innerHTML=`<div class="pos">${wood}<div class="shade"></div><div class="stripe" style="background:${cc}"></div><div class="stripe2"></div><div class="lg2">${logo(40,S.settings.show13,1)}</div>
   <div class="in">${dd?`<div class="dt"><small>${dd.toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','').toUpperCase()}</small><b>${dd.getDate()}</b><small>${dd.toLocaleDateString('fr-FR',{month:'short'}).replace('.','').toUpperCase()}</small></div>`:''}
   <div style="flex:1;min-width:0;padding-right:70px"><div>${t.cec?'<span class="tg2" style="background:linear-gradient(135deg,#FFF3C4,#FFD54F 30%,#E8A914 60%,#FFE38A);color:#2E2205">SÉANCE CEC</span>':'<span class="tg2" style="background:#22D3EE;color:#052A31">SÉANCE</span>'}${c?`<span class="tg2" style="background:${cc};color:#0B1020">${esc(c.title.toUpperCase())}</span>`:''}</div>
@@ -1134,6 +1138,7 @@ function printProg(){
      <div><div style="display:flex;gap:3px">${strip}</div></div>
      ${ts.length?`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 14px;padding-top:7px;border-top:1px solid #EEF0F4">${ts.map(t=>`<div style="display:flex;gap:7px;font-size:8.5pt;line-height:1.35;min-width:0"><span style="flex:none;width:46px;color:#8A93A3;font-weight:600">${pd(t.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}).replace('.','')}</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title||'Séance')}${t.cec?' <b style="color:#B7791F">· CEC</b>':''}</span></div>`).join('')}</div>`:'<div style="font-size:8.5pt;color:#A0A7B4;padding-top:7px;border-top:1px solid #EEF0F4">Aucune séance prévue pour l\'instant</div>'}
     </div></div>`}).join('');
+  runHead('Programmation',['Saison '+String(y).slice(2)+'-'+String(y+1).slice(2),S.projet&&S.projet.category].filter(Boolean).join(' · '));
   $('#print').innerHTML=`${head}${cys.length?tl:''}<div class="sec2">Les cycles</div>${cards||'<p>Aucun cycle daté.</p>'}`;
   try{window.print()}catch(e){}
 }
@@ -1152,6 +1157,7 @@ function printProjet(){
   const tab=`<div class="sec2">Vue d'ensemble</div><table class="tl"><tr><td style="font-weight:700;color:#5A6372;font-size:8pt;letter-spacing:.08em">DOMAINE</td>${LEVELS.map((L,i)=>`<td class="d" style="width:110px"><span class="tg" style="background:${LC[i]}">${L[0].toUpperCase()}</span></td>`).join('')}</tr>${P.domains.map((d,i)=>`<tr><td><span class="tg" style="background:${domHex(d)};color:#12151D;margin-right:8px;min-width:22px">${i+1}</span><b>${esc(d.name)}</b></td>${[0,1,2].map(l=>`<td class="d" style="width:110px;font-weight:600;color:#12151D">${d.items.filter(x=>x.level===l).length||'—'}</td>`).join('')}</tr>`).join('')}<tr class="tot"><td>Total</td>${byL.map(n=>`<td class="d">${n}</td>`).join('')}</tr></table>`;
   const doms=P.domains.map((d,i)=>{const col=domHex(d);
     return `<div class="bk"><div class="bkh" style="border-left:6px solid ${col};border-radius:0"><span class="num">${i+1}</span><h2>${esc(d.name)}</h2><span class="meta">${d.items.length} élément${d.items.length>1?'s':''}</span></div><div class="pl" style="padding:9px 11px 11px;margin:0">${LEVELS.map((L,li)=>{const items=d.items.filter(x=>x.level===li);return `<div><span class="tg" style="background:${LC[li]}">${L[0].toUpperCase()}</span>${items.length?`<ul style="list-style:none;padding:0;margin:7px 0 0">${items.map(x=>`<li style="display:flex;gap:7px;align-items:flex-start;font-size:9.5pt;line-height:1.35;margin-bottom:5px"><span style="flex:none;width:9px;height:9px;border-radius:5px;margin-top:4px;background:${LC[li]}"></span><span>${esc(x.label)}</span></li>`).join('')}</ul>`:'<p style="color:#A0A7B4;margin-top:7px">—</p>'}</div>`}).join('')}</div></div>`}).join('');
+  runHead('Projet pédagogique',['Saison '+String(y).slice(2)+'-'+String(y+1).slice(2),P.category].filter(Boolean).join(' · '));
   $('#print').innerHTML=`${head}${P.domains.length?tab:''}<div class="sec2">Domaines</div>${doms||'<p>Aucun domaine.</p>'}`;
   try{window.print()}catch(e){}
 }
@@ -1321,7 +1327,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261110000901';
+const APP_VER='20261110211444';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
