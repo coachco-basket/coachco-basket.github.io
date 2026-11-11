@@ -181,7 +181,9 @@ nav.tabs button.on span{background:var(--cy-t)}
 @media print{
   #app,nav.tabs,.ovl,.ed{display:none!important}
   :root{color-scheme:light!important;background:#fff!important}
+  html,body{height:auto!important;min-height:0!important;overflow:visible!important}
   body{background:#fff!important;color:#111!important}
+  #print>:last-child,#print>:last-child>:last-child{margin-bottom:0!important}
   #print{display:block;font:11pt/1.4 var(--ff);color:#111;padding:0}
   #print .ph{display:flex;align-items:center;gap:14px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:12px}
   #print h1{font:600 20pt var(--fd);margin:0}
@@ -1346,7 +1348,7 @@ document.addEventListener('keydown',e=>{if(ED&&(e.key==='z'||e.key==='Z')&&(e.ct
 
 render(true);
 /* mise à jour automatique : compare la version affichée à la version en ligne */
-const APP_VER='20261110212523';
+const APP_VER='20261111103339';
 function checkUpdate(first){if(!onWeb()||APP_VER.indexOf('__')===0)return;fetch('./version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(v=>{if(!v||!v.v||v.v===APP_VER)return;if(ED||$('.ovl')||DRG)return;let n=0;try{n=+sessionStorage.getItem('coachco-upd-'+v.v)||0;sessionStorage.setItem('coachco-upd-'+v.v,n+1)}catch(e){}if(n<2)location.replace('./?v='+v.v)}).catch(()=>{})}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
 setTimeout(()=>checkUpdate(true),1500);
